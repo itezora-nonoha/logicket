@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import 'auth/login_screen.dart';
 import 'user_profile_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -195,6 +196,14 @@ class SettingsScreen extends StatelessWidget {
                     side: const BorderSide(color: Colors.red),
                   ),
                 ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const LoginScreen(),
+                  ),
+                ),
+                child: const Text('ログイン画面へ'),
               ),
             ],
           );
