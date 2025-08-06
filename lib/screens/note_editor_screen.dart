@@ -19,18 +19,21 @@ class NoteEditorScreen extends StatefulWidget {
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
-  late TextEditingController _controller;
+  late TextEditingController _titleController;
+  late TextEditingController _contentController;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController(text: widget.note?.content ?? '');
+    _titleController = TextEditingController(text: widget.note?.title ?? '');
+    _contentController = TextEditingController(text: widget.note?.content ?? '');
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _titleController.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 
@@ -38,7 +41,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.note == null ? '新しいノート' : 'ノートを編集'),
+        title: Text(
+          widget.note == null ? '新しいノート' : 'ノートを編集',
+          style: const TextStyle(fontFamily: 'NotoSansJP'),
+        ),
         actions: [
           if (_isLoading)
             const Center(
@@ -56,7 +62,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               onPressed: _saveNote,
               child: const Text(
                 '保存',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'NotoSansJP',
+                ),
               ),
             ),
         ],
@@ -90,24 +99,51 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 14,
+                        fontFamily: 'NotoSansJP',
                       ),
                     ),
                   ],
                 ),
               ),
+            
+            // タイトル入力欄
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(
+                labelText: 'タイトル（任意）',
+                hintText: 'ノートのタイトルを入力...',
+                border: OutlineInputBorder(),
+                labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                contentPadding: EdgeInsets.all(16),
+              ),
+              style: const TextStyle(
+                fontSize: 16,
+                fontFamily: 'NotoSansJP',
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            // 本文入力欄
             Expanded(
               child: TextField(
-                controller: _controller,
+                controller: _contentController,
                 maxLines: null,
                 expands: true,
                 decoration: const InputDecoration(
+                  labelText: '本文',
                   hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
                   border: OutlineInputBorder(),
+                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   contentPadding: EdgeInsets.all(16),
+                  alignLabelWithHint: true,
                 ),
                 style: const TextStyle(
                   fontSize: 16,
                   height: 1.5,
+                  fontFamily: 'NotoSansJP',
                 ),
               ),
             ),
@@ -118,6 +154,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 onPressed: _isLoading ? null : _saveNote,
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
+                  textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
                 ),
                 child: Text(_isLoading ? '保存中...' : '保存'),
               ),
@@ -129,9 +166,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   }
 
   Future<void> _saveNote() async {
-    if (_controller.text.trim().isEmpty) {
+    if (_contentController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('ノートが空です')),
+        const SnackBar(
+          content: Text(
+            'ノートの本文が空です',
+            style: TextStyle(fontFamily: 'NotoSansJP'),
+          ),
+        ),
       );
       return;
     }
@@ -143,28 +185,48 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final authService = context.read<AuthService>();
       final userId = authService.userId!;
       
+      final title = _titleController.text.trim().isEmpty 
+          ? null 
+          : _titleController.text.trim();
+      
       if (widget.note == null) {
         // 新規作成
         await noteService.createNote(
           userId,
-          _controller.text.trim(),
+          _contentController.text.trim(),
+          title: title,
           insertAfterOrder: widget.insertAfterOrder,
         );
       } else {
         // 更新
-        await noteService.updateNote(userId, widget.note!.id, _controller.text.trim());
+        await noteService.updateNote(
+          userId, 
+          widget.note!.id, 
+          _contentController.text.trim(),
+          title: title,
+        );
       }
 
       if (mounted) {
         Navigator.of(context).pop();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ノートを保存しました')),
+          const SnackBar(
+            content: Text(
+              'ノートを保存しました',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
+          ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('保存に失敗しました: $e')),
+          SnackBar(
+            content: Text(
+              '保存に失敗しました: $e',
+              style: const TextStyle(fontFamily: 'NotoSansJP'),
+            ),
+          ),
         );
       }
     } finally {

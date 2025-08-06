@@ -55,6 +55,7 @@ class NoteService extends ChangeNotifier {
     final sampleNotes = [
       Note(
         id: _uuid.v4(),
+        title: 'ツェッテルカステンについて',
         content: '''# ツェッテルカステンとは
 
 ツェッテルカステンは知識管理の手法です。
@@ -70,6 +71,7 @@ class NoteService extends ChangeNotifier {
       ),
       Note(
         id: 'note2',
+        title: '創発的思考',
         content: '''## 創発的思考について
 
 個々のアイデアが組み合わさることで、新しい洞察が生まれる現象。
@@ -114,7 +116,7 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  Future<void> createNote(String userId, String content, {double? insertAfterOrder}) async {
+  Future<void> createNote(String userId, String content, {String? title, double? insertAfterOrder}) async {
     if (userId.isEmpty) return;
 
     final now = DateTime.now();
@@ -140,6 +142,7 @@ class NoteService extends ChangeNotifier {
 
     final note = Note(
       id: _uuid.v4(),
+      title: title,
       content: content,
       order: newOrder,
       linkedNotes: _extractLinkedNotes(content),
@@ -163,12 +166,13 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateNote(String userId, String id, String content) async {
+  Future<void> updateNote(String userId, String id, String content, {String? title}) async {
     if (userId.isEmpty) return;
 
     final index = _notes.indexWhere((note) => note.id == id);
     if (index != -1) {
       final updatedNote = _notes[index].copyWith(
+        title: title,
         content: content,
         linkedNotes: _extractLinkedNotes(content),
         updatedAt: DateTime.now(),
@@ -232,5 +236,10 @@ class NoteService extends ChangeNotifier {
     final regex = RegExp(r'\[\[([^\]]+)\]\]');
     final matches = regex.allMatches(content);
     return matches.map((match) => match.group(1)!).toList();
+  }
+
+  // ノートの詳細情報を最新に更新する（詳細画面での更新漏れ対策）
+  void refreshNote(String noteId) {
+    notifyListeners();
   }
 }

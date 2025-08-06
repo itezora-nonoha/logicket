@@ -6,149 +6,216 @@ import '../services/auth_service.dart';
 import '../services/note_service.dart';
 import 'note_editor_screen.dart';
 
-class NoteDetailScreen extends StatelessWidget {
+class NoteDetailScreen extends StatefulWidget {
   final Note note;
 
   const NoteDetailScreen({super.key, required this.note});
 
   @override
+  State<NoteDetailScreen> createState() => _NoteDetailScreenState();
+}
+
+class _NoteDetailScreenState extends State<NoteDetailScreen> {
+  late Note _currentNote;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentNote = widget.note;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('ノート詳細'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => _navigateToEditor(context),
-          ),
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'delete') {
-                _showDeleteDialog(context);
-              }
-            },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'delete',
-                child: Row(
-                  children: [
-                    Icon(Icons.delete, color: Colors.red),
-                    SizedBox(width: 8),
-                    Text('削除', style: TextStyle(color: Colors.red)),
-                  ],
-                ),
+    return Consumer<NoteService>(
+      builder: (context, noteService, child) {
+        // 最新のノート情報を取得
+        final latestNote = noteService.getNoteById(_currentNote.id);
+        if (latestNote != null) {
+          _currentNote = latestNote;
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'ノート詳細',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _navigateToEditor(context),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'delete') {
+                    _showDeleteDialog(context);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red),
+                        SizedBox(width: 8),
+                        Text(
+                          '削除',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontFamily: 'NotoSansJP',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ノート内容
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: MarkdownBody(
-                  data: note.content,
-                  styleSheet: MarkdownStyleSheet(
-                    p: const TextStyle(fontSize: 16, height: 1.6),
-                    h1: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    h2: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    h3: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    code: TextStyle(
-                      backgroundColor: Colors.grey[100],
-                      fontFamily: 'monospace',
-                      fontSize: 14,
-                    ),
-                    codeblockDecoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    blockquote: TextStyle(
-                      color: Colors.grey[600],
-                      fontStyle: FontStyle.italic,
-                    ),
-                    blockquoteDecoration: BoxDecoration(
-                      color: Colors.grey[50],
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ノート内容
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // タイトルがある場合は表示
+                        if (_currentNote.title != null && _currentNote.title!.trim().isNotEmpty) ...[
+                          Text(
+                            _currentNote.title!,
+                            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        MarkdownBody(
+                          data: _currentNote.content,
+                          styleSheet: MarkdownStyleSheet(
+                            p: const TextStyle(
+                              fontSize: 16, 
+                              height: 1.6,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                            h1: const TextStyle(
+                              fontSize: 24, 
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                            h2: const TextStyle(
+                              fontSize: 20, 
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                            h3: const TextStyle(
+                              fontSize: 18, 
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                            code: TextStyle(
+                              backgroundColor: Colors.grey[100],
+                              fontFamily: 'Consolas, Monaco, Courier, monospace',
+                              fontSize: 14,
+                            ),
+                            codeblockDecoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            blockquote: TextStyle(
+                              color: Colors.grey[600],
+                              fontStyle: FontStyle.italic,
+                              fontFamily: 'NotoSansJP',
+                            ),
+                            blockquoteDecoration: BoxDecoration(
+                              color: Colors.grey[50],
+                            ),
+                          ),
+                          onTapLink: (text, href, title) {
+                            if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
+                              final noteId = href!.substring(2, href.length - 2);
+                              _handleNoteLink(context, noteId);
+                            }
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  onTapLink: (text, href, title) {
-                    if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
-                      final noteId = href!.substring(2, href.length - 2);
-                      _handleNoteLink(context, noteId);
-                    }
-                  },
                 ),
-              ),
-            ),
-            
-            const SizedBox(height: 24),
-            
-            // メタ情報
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'メタ情報',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildMetaRow(Icons.schedule, '作成日時', _formatDateTime(note.createdAt)),
-                    const SizedBox(height: 8),
-                    _buildMetaRow(Icons.update, '更新日時', _formatDateTime(note.updatedAt)),
-                    const SizedBox(height: 8),
-                    _buildMetaRow(Icons.sort, '順序', '${note.order}'),
-                    if (note.linkedNotes.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      _buildMetaRow(Icons.link, 'リンク数', '${note.linkedNotes.length}個'),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // バックリンク
-            Consumer<NoteService>(
-              builder: (context, noteService, child) {
-                final backlinks = noteService.getBacklinks(note.id);
                 
-                if (backlinks.isEmpty) {
-                  return const SizedBox.shrink();
-                }
+                const SizedBox(height: 24),
                 
-                return Card(
+                // メタ情報
+                Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'バックリンク (${backlinks.length})',
+                          'メタ情報',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
+                            fontFamily: 'NotoSansJP',
                           ),
                         ),
                         const SizedBox(height: 12),
-                        ...backlinks.map((backlink) => _buildBacklinkItem(context, backlink)),
+                        _buildMetaRow(Icons.schedule, '作成日時', _formatDateTime(_currentNote.createdAt)),
+                        const SizedBox(height: 8),
+                        _buildMetaRow(Icons.update, '更新日時', _formatDateTime(_currentNote.updatedAt)),
+                        const SizedBox(height: 8),
+                        _buildMetaRow(Icons.sort, '順序', '${_currentNote.order}'),
+                        if (_currentNote.linkedNotes.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          _buildMetaRow(Icons.link, 'リンク数', '${_currentNote.linkedNotes.length}個'),
+                        ],
                       ],
                     ),
                   ),
-                );
-              },
+                ),
+                
+                const SizedBox(height: 16),
+                
+                // バックリンク
+                Builder(
+                  builder: (context) {
+                    final backlinks = noteService.getBacklinks(_currentNote.id);
+                    
+                    if (backlinks.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    
+                    return Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'バックリンク (${backlinks.length})',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontFamily: 'NotoSansJP',
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ...backlinks.map((backlink) => _buildBacklinkItem(context, backlink)),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -162,12 +229,16 @@ class NoteDetailScreen extends StatelessWidget {
           style: TextStyle(
             fontWeight: FontWeight.w500,
             color: Colors.grey[700],
+            fontFamily: 'NotoSansJP',
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: TextStyle(color: Colors.grey[600]),
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontFamily: 'NotoSansJP',
+            ),
           ),
         ),
       ],
@@ -190,9 +261,25 @@ class NoteDetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (backlink.title != null && backlink.title!.trim().isNotEmpty) ...[
+              Text(
+                backlink.title!,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'NotoSansJP',
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 4),
+            ],
             Text(
               _getPreviewText(backlink.content),
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(
+                fontSize: 14,
+                fontFamily: 'NotoSansJP',
+              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -202,6 +289,7 @@ class NoteDetailScreen extends StatelessWidget {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
+                fontFamily: 'NotoSansJP',
               ),
             ),
           ],
@@ -225,12 +313,16 @@ class NoteDetailScreen extends StatelessWidget {
            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  void _navigateToEditor(BuildContext context) {
-    Navigator.of(context).push(
+  void _navigateToEditor(BuildContext context) async {
+    await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => NoteEditorScreen(note: note),
+        builder: (context) => NoteEditorScreen(note: _currentNote),
       ),
     );
+    // 編集画面から戻ってきた時に最新データを反映
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   void _navigateToNote(BuildContext context, Note targetNote) {
@@ -251,12 +343,21 @@ class NoteDetailScreen extends StatelessWidget {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('リンクエラー'),
-          content: Text('ノート "$noteId" が見つかりません'),
+          title: const Text(
+            'リンクエラー',
+            style: TextStyle(fontFamily: 'NotoSansJP'),
+          ),
+          content: Text(
+            'ノート "$noteId" が見つかりません',
+            style: const TextStyle(fontFamily: 'NotoSansJP'),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('閉じる'),
+              child: const Text(
+                '閉じる',
+                style: TextStyle(fontFamily: 'NotoSansJP'),
+              ),
             ),
           ],
         ),
@@ -268,27 +369,44 @@ class NoteDetailScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('ノートを削除'),
-        content: const Text('このノートを削除しますか？この操作は取り消せません。'),
+        title: const Text(
+          'ノートを削除',
+          style: TextStyle(fontFamily: 'NotoSansJP'),
+        ),
+        content: const Text(
+          'このノートを削除しますか？この操作は取り消せません。',
+          style: TextStyle(fontFamily: 'NotoSansJP'),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル'),
+            child: const Text(
+              'キャンセル',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
           ),
           TextButton(
             onPressed: () async {
               final authService = context.read<AuthService>();
-              await context.read<NoteService>().deleteNote(authService.userId!, note.id);
+              await context.read<NoteService>().deleteNote(authService.userId!, _currentNote.id);
               if (context.mounted) {
                 Navigator.of(context).pop(); // ダイアログを閉じる
                 Navigator.of(context).pop(); // 詳細画面を閉じる
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('ノートを削除しました')),
+                  const SnackBar(
+                    content: Text(
+                      'ノートを削除しました',
+                      style: TextStyle(fontFamily: 'NotoSansJP'),
+                    ),
+                  ),
                 );
               }
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('削除'),
+            child: const Text(
+              '削除',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
           ),
         ],
       ),
