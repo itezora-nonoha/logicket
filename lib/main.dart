@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'models/note.dart';
 import 'services/note_service.dart';
-import 'screens/home_screen.dart';
+import 'screens/auth_wrapper.dart';
 import 'services/auth_service.dart';
 
 void main() async {
@@ -90,7 +90,7 @@ class LogicketApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const HomeScreen(),
+        home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
       ),
     );
