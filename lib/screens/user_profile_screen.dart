@@ -293,6 +293,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     label: const Text('ログアウト'),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: Colors.red,
+                      side: const BorderSide(color: Colors.red),
                     ),
                   ),
                 ),

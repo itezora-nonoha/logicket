@@ -1,13 +1,41 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:uuid/uuid.dart';
+import 'dart:convert';
 import '../models/note.dart';
 
 class NoteService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final Uuid _uuid = const Uuid();
   final List<Note> _notes = [];
   bool _isLoading = false;
+
+  /// ユーザーID + タイムスタンプから6桁の英数字ハッシュIDを生成
+  String _generateNoteId(String userId) {
+    final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
+    final input = '$userId-$timestamp';
+    final bytes = utf8.encode(input);
+    final digest = _simpleHash(bytes);
+    
+    // 英数字のみで6桁のIDを生成
+    const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    var result = '';
+    var hash = digest;
+    
+    for (int i = 0; i < 6; i++) {
+      result += chars[hash % chars.length];
+      hash = hash ~/ chars.length;
+    }
+    
+    return result;
+  }
+
+  /// シンプルなハッシュ関数
+  int _simpleHash(List<int> bytes) {
+    var hash = 0;
+    for (int byte in bytes) {
+      hash = ((hash << 5) + hash + byte) & 0x7FFFFFFF;
+    }
+    return hash;
+  }
 
   List<Note> get notes {
     List<Note> sortedNotes = _notes.where((note) => !note.isDeleted).toList();
@@ -54,7 +82,7 @@ class NoteService extends ChangeNotifier {
     final now = DateTime.now();
     final sampleNotes = [
       Note(
-        id: _uuid.v4(),
+        id: _generateNoteId(userId),
         title: 'ツェッテルカステンについて',
         content: '''# ツェッテルカステンとは
 
@@ -141,7 +169,7 @@ class NoteService extends ChangeNotifier {
     }
 
     final note = Note(
-      id: _uuid.v4(),
+      id: _generateNoteId(userId),
       title: title,
       content: content,
       order: newOrder,

@@ -97,7 +97,7 @@ class NoteCard extends StatelessWidget {
     return Column(
       children: [
         MarkdownBody(
-          data: note.content,
+          data: _convertInternalLinks(note.content),
           styleSheet: MarkdownStyleSheet(
             p: const TextStyle(
               fontSize: 14, 
@@ -127,10 +127,14 @@ class NoteCard extends StatelessWidget {
               color: Colors.grey[100],
               borderRadius: BorderRadius.circular(4),
             ),
+            a: TextStyle(
+              color: Theme.of(context).primaryColor,
+              decoration: TextDecoration.underline,
+            ),
           ),
           onTapLink: (text, href, title) {
-            if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
-              final noteId = href!.substring(2, href.length - 2);
+            if (href?.startsWith('note://') == true) {
+              final noteId = href!.substring(7); // "note://" を除去
               _handleNoteLink(context, noteId);
             }
           },
@@ -304,6 +308,17 @@ class NoteCard extends StatelessWidget {
 
     // 触覚フィードバック（デバイスが対応している場合）
     HapticFeedback.mediumImpact();
+  }
+
+  /// [[ノートID]] 形式を [ノートID](note://ノートID) 形式に変換
+  String _convertInternalLinks(String content) {
+    return content.replaceAllMapped(
+      RegExp(r'\[\[([^\]]+)\]\]'),
+      (match) {
+        final noteId = match.group(1)!;
+        return '[$noteId](note://$noteId)';
+      },
+    );
   }
 
   String _formatDateTime(DateTime dateTime) {

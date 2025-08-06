@@ -96,7 +96,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           const SizedBox(height: 16),
                         ],
                         MarkdownBody(
-                          data: _currentNote.content,
+                          data: _convertInternalLinks(_currentNote.content),
                           styleSheet: MarkdownStyleSheet(
                             p: const TextStyle(
                               fontSize: 16, 
@@ -135,10 +135,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             blockquoteDecoration: BoxDecoration(
                               color: Colors.grey[50],
                             ),
+                            a: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              decoration: TextDecoration.underline,
+                            ),
                           ),
                           onTapLink: (text, href, title) {
-                            if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
-                              final noteId = href!.substring(2, href.length - 2);
+                            if (href?.startsWith('note://') == true) {
+                              final noteId = href!.substring(7); // "note://" を除去
                               _handleNoteLink(context, noteId);
                             }
                           },
@@ -323,6 +327,17 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  /// [[ノートID]] 形式を [ノートID](note://ノートID) 形式に変換
+  String _convertInternalLinks(String content) {
+    return content.replaceAllMapped(
+      RegExp(r'\[\[([^\]]+)\]\]'),
+      (match) {
+        final noteId = match.group(1)!;
+        return '[$noteId](note://$noteId)';
+      },
+    );
   }
 
   void _navigateToNote(BuildContext context, Note targetNote) {
