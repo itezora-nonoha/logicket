@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/note_service.dart';
+import '../services/auth_service.dart';
 import '../models/note.dart';
 
 class NoteEditorScreen extends StatefulWidget {
@@ -139,16 +140,19 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     try {
       final noteService = context.read<NoteService>();
+      final authService = context.read<AuthService>();
+      final userId = authService.userId!;
       
       if (widget.note == null) {
         // 新規作成
         await noteService.createNote(
+          userId,
           _controller.text.trim(),
           insertAfterOrder: widget.insertAfterOrder,
         );
       } else {
         // 更新
-        await noteService.updateNote(widget.note!.id, _controller.text.trim());
+        await noteService.updateNote(userId, widget.note!.id, _controller.text.trim());
       }
 
       if (mounted) {

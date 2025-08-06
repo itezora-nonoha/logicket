@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 import '../models/note.dart';
+import '../services/auth_service.dart';
 import '../services/note_service.dart';
 import 'note_editor_screen.dart';
 
@@ -276,7 +277,8 @@ class NoteDetailScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () async {
-              await context.read<NoteService>().deleteNote(note.id);
+              final authService = context.read<AuthService>();
+              await context.read<NoteService>().deleteNote(authService.userId!, note.id);
               if (context.mounted) {
                 Navigator.of(context).pop(); // ダイアログを閉じる
                 Navigator.of(context).pop(); // 詳細画面を閉じる
@@ -293,4 +295,3 @@ class NoteDetailScreen extends StatelessWidget {
     );
   }
 }
-    

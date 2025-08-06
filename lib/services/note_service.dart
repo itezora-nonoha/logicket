@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:uuid/uuid.dart';
 import '../models/note.dart';
 
 class NoteService extends ChangeNotifier {
-  final List<Note> _notes = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final Uuid _uuid = const Uuid();
-  double _lastOrder = 1000.0;
+  final List<Note> _notes = [];
+  bool _isLoading = false;
 
   List<Note> get notes {
     List<Note> sortedNotes = _notes.where((note) => !note.isDeleted).toList();
@@ -13,13 +15,44 @@ class NoteService extends ChangeNotifier {
     return sortedNotes;
   }
 
-  NoteService() {
-    _initSampleData();
+  bool get isLoading => _isLoading;
+
+  Future<void> loadNotes(String userId) async {
+    if (userId.isEmpty) return;
+    
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final QuerySnapshot snapshot = await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notes')
+          .where('isDeleted', isEqualTo: false)
+          .get();
+
+      _notes.clear();
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        _notes.add(Note.fromMap(data));
+      }
+
+      // サンプルデータがない場合は作成
+      if (_notes.isEmpty) {
+        await _initSampleData(userId);
+      }
+    } catch (e) {
+      debugPrint('ノート読み込みエラー: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
-  void _initSampleData() {
+  Future<void> _initSampleData(String userId) async {
     final now = DateTime.now();
-    _notes.addAll([
+    final sampleNotes = [
       Note(
         id: _uuid.v4(),
         content: '''# ツェッテルカステンとは
@@ -55,11 +88,11 @@ class NoteService extends ChangeNotifier {
         id: 'note3',
         content: '''## 知識の関連付け
 
-```
+\`\`\`
 ノートA ← → ノートB
    ↓      ↗
 ノートC → ノートD
-```
+\`\`\`
 
 このような網目状の構造で知識を蓄積していきます。
 
@@ -68,17 +101,27 @@ class NoteService extends ChangeNotifier {
         createdAt: now.subtract(const Duration(minutes: 30)),
         updatedAt: now.subtract(const Duration(minutes: 30)),
       ),
-    ]);
-    notifyListeners();
+    ];
+
+    for (var note in sampleNotes) {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notes')
+          .doc(note.id)
+          .set(note.toMap());
+      _notes.add(note);
+    }
   }
 
-  Future<void> createNote(String content, {double? insertAfterOrder}) async {
+  Future<void> createNote(String userId, String content, {double? insertAfterOrder}) async {
+    if (userId.isEmpty) return;
+
     final now = DateTime.now();
     double newOrder;
 
     if (insertAfterOrder != null) {
       // 指定位置に挿入
-      final afterNote = _notes.where((n) => n.order == insertAfterOrder).firstOrNull;
       final beforeNote = _notes
           .where((n) => !n.isDeleted && n.order < insertAfterOrder)
           .fold<Note?>(null, (prev, curr) => 
@@ -91,8 +134,8 @@ class NoteService extends ChangeNotifier {
       }
     } else {
       // 先頭に挿入
-      newOrder = _lastOrder + 1.0;
-      _lastOrder = newOrder;
+      final maxOrder = _notes.isEmpty ? 0.0 : _notes.map((n) => n.order).reduce((a, b) => a > b ? a : b);
+      newOrder = maxOrder + 1.0;
     }
 
     final note = Note(
@@ -104,41 +147,74 @@ class NoteService extends ChangeNotifier {
       updatedAt: now,
     );
 
-    _notes.add(note);
-    notifyListeners();
+    try {
+      await _firestore
+          .collection('users')
+          .doc(userId)
+          .collection('notes')
+          .doc(note.id)
+          .set(note.toMap());
+
+      _notes.add(note);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('ノート作成エラー: $e');
+      rethrow;
+    }
   }
 
-  Future<void> updateNote(String id, String content) async {
+  Future<void> updateNote(String userId, String id, String content) async {
+    if (userId.isEmpty) return;
+
     final index = _notes.indexWhere((note) => note.id == id);
     if (index != -1) {
-      _notes[index] = _notes[index].copyWith(
+      final updatedNote = _notes[index].copyWith(
         content: content,
         linkedNotes: _extractLinkedNotes(content),
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
+
+      try {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notes')
+            .doc(id)
+            .update(updatedNote.toMap());
+
+        _notes[index] = updatedNote;
+        notifyListeners();
+      } catch (e) {
+        debugPrint('ノート更新エラー: $e');
+        rethrow;
+      }
     }
   }
 
-  Future<void> deleteNote(String id) async {
+  Future<void> deleteNote(String userId, String id) async {
+    if (userId.isEmpty) return;
+
     final index = _notes.indexWhere((note) => note.id == id);
     if (index != -1) {
-      _notes[index] = _notes[index].copyWith(
+      final deletedNote = _notes[index].copyWith(
         isDeleted: true,
         updatedAt: DateTime.now(),
       );
-      notifyListeners();
-    }
-  }
 
-  Future<void> reorderNote(String id, double newOrder) async {
-    final index = _notes.indexWhere((note) => note.id == id);
-    if (index != -1) {
-      _notes[index] = _notes[index].copyWith(
-        order: newOrder,
-        updatedAt: DateTime.now(),
-      );
-      notifyListeners();
+      try {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notes')
+            .doc(id)
+            .update({'isDeleted': true, 'updatedAt': FieldValue.serverTimestamp()});
+
+        _notes[index] = deletedNote;
+        notifyListeners();
+      } catch (e) {
+        debugPrint('ノート削除エラー: $e');
+        rethrow;
+      }
     }
   }
 

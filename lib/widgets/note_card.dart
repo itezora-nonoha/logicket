@@ -23,7 +23,7 @@ class NoteCard extends StatelessWidget {
 
   Widget _buildMobileCard(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      // margin: const EdgeInsets.only(bottom: 16),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
@@ -46,7 +46,7 @@ class NoteCard extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 600),
       child: Card(
-        margin: const EdgeInsets.only(bottom: 16),
+        // margin: const EdgeInsets.only(bottom: 16),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -67,29 +67,67 @@ class NoteCard extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    return MarkdownBody(
-      data: note.content,
-      styleSheet: MarkdownStyleSheet(
-        p: const TextStyle(fontSize: 14, height: 1.4),
-        h1: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-        h2: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        h3: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        code: TextStyle(
-          backgroundColor: Colors.grey[100],
-          fontFamily: 'monospace',
+    return Column(
+      children: [
+        MarkdownBody(
+          data: note.content,
+          styleSheet: MarkdownStyleSheet(
+            p: const TextStyle(fontSize: 14, height: 1.4),
+            h1: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            h2: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            h3: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+            code: TextStyle(
+              backgroundColor: Colors.grey[100],
+              fontFamily: 'monospace',
+            ),
+            codeblockDecoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(4),
+            ),
+          ),
+          onTapLink: (text, href, title) {
+            if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
+              final noteId = href!.substring(2, href.length - 2);
+              _handleNoteLink(context, noteId);
+            }
+          },
         ),
-        codeblockDecoration: BoxDecoration(
-          color: Colors.grey[100],
-          borderRadius: BorderRadius.circular(4),
+        // ノートIDを右下に表示
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                'ID: ${_safeSubstring(note.id, 0, 8)}...',
+                style: TextStyle(
+                  fontSize: 10,
+                  color: Colors.grey[500],
+                  fontFamily: 'monospace',
+                ),
+              ),
+            ),
+          ),
         ),
-      ),
-      onTapLink: (text, href, title) {
-        if (href?.startsWith('[[') == true && href?.endsWith(']]') == true) {
-          final noteId = href!.substring(2, href.length - 2);
-          _handleNoteLink(context, noteId);
-        }
-      },
+      ],
     );
+  }
+  
+  String _safeSubstring(String text, int start, int length) {
+    if (text.isEmpty) return '';
+    if (start >= text.length) return '';
+    
+    final end = start + length;
+    if (end <= text.length) {
+      return text.substring(start, end);
+    } else {
+      return text.substring(start);
+    }
   }
 
   Widget _buildFooter(BuildContext context) {

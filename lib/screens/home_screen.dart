@@ -24,17 +24,42 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authService = context.read<AuthService>();
+      final noteService = context.read<NoteService>();
+      
+      if (authService.isAuthenticated && authService.userId != null) {
+        noteService.loadNotes(authService.userId!);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ResponsiveLayout(
-      mobile: _buildMobileLayout(),
-      desktop: _buildDesktopLayout(),
+    return Consumer<AuthService>(
+      builder: (context, authService, child) {
+        if (!authService.isAuthenticated) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        return ResponsiveLayout(
+          mobile: _buildMobileLayout(),
+          desktop: _buildDesktopLayout(),
+        );
+      },
     );
   }
 
   Widget _buildMobileLayout() {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Zettelkasten'),
+        title: const Text('Logicket'),
         elevation: 1,
       ),
       body: _pages[_selectedIndex],
@@ -93,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Expanded(
             child: Scaffold(
               appBar: AppBar(
-                title: const Text('Zettelkasten'),
+                title: const Text('Logicket'),
                 automaticallyImplyLeading: false,
               ),
               body: _pages[_selectedIndex],
