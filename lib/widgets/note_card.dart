@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/note.dart';
 import '../widgets/responsive_layout.dart';
@@ -25,6 +26,7 @@ class NoteCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: onTap,
+        onLongPress: () => _copyNoteContent(context),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -60,6 +62,7 @@ class NoteCard extends StatelessWidget {
       child: Card(
         child: InkWell(
           onTap: onTap,
+          onLongPress: () => _copyNoteContent(context),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -175,6 +178,22 @@ class NoteCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
           ],
+          // コピーヒント
+          Icon(
+            Icons.content_copy,
+            size: 12,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(width: 4),
+          Text(
+            'ロングタップでコピー',
+            style: TextStyle(
+              fontSize: 10,
+              color: Colors.grey[400],
+              fontFamily: 'NotoSansJP',
+            ),
+          ),
+          const SizedBox(width: 8),
           // ノートID
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -221,6 +240,75 @@ class NoteCard extends StatelessWidget {
     } else {
       return 'たった今';
     }
+  }
+
+  void _copyNoteContent(BuildContext context) {
+    // コピーする内容を準備
+    String copyText = '';
+    
+    // タイトルがある場合は含める。タイトルはh1とする
+    if (note.title != null && note.title!.trim().isNotEmpty) {
+      copyText += '# ${note.title!}\n\n';
+    }
+    
+    // 本文を追加
+    copyText += note.content;
+    
+    // メタ情報を追加
+    copyText += '\n';
+    // copyText += '\n\n---\n';
+    // copyText += 'ノートID: ${note.id}\n';
+    // copyText += '作成日時: ${_formatDateTime(note.createdAt)}\n';
+    // copyText += '更新日時: ${_formatDateTime(note.updatedAt)}';
+    
+    // クリップボードにコピー
+    Clipboard.setData(ClipboardData(text: copyText)).then((_) {
+      // コピー完了の視覚的フィードバック
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(
+                Icons.content_copy,
+                color: Colors.white,
+                size: 16,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'ノートをクリップボードにコピーしました',
+                style: const TextStyle(fontFamily: 'NotoSansJP'),
+              ),
+            ],
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          duration: const Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+      );
+    }).catchError((error) {
+      // エラーハンドリング
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'コピーに失敗しました: $error',
+            style: const TextStyle(fontFamily: 'NotoSansJP'),
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    });
+
+    // 触覚フィードバック（デバイスが対応している場合）
+    HapticFeedback.mediumImpact();
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')} '
+           '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
   void _handleNoteLink(BuildContext context, String noteId) {
