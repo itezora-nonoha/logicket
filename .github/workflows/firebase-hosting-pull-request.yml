@@ -13,6 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - run: ls ./web
+      - name: Loading Secret API Key
+      - run: sed -i -e 's/{$firebaseAppConfigKey}/${{ secrets.FIREBASE_APP_CONFIG_APIKEY }}/' ./web/index.html
+      - run: cat ./web/index.html
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
