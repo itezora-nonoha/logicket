@@ -29,21 +29,27 @@ class TimelineView extends StatelessWidget {
           );
         }
 
-        return ListView.builder(
+        return ReorderableListView.builder(
           padding: const EdgeInsets.all(16),
           itemCount: notes.length,
+          onReorder: (oldIndex, newIndex) => _reorderNotes(context, notes, oldIndex, newIndex),
           itemBuilder: (context, index) {
             final note = notes[index];
             final isLast = index == notes.length - 1;
             
-            return Column(
-              children: [
-                NoteCard(
-                  note: note,
-                  onTap: () => _navigateToDetail(context, note),
-                ),
-                if (!isLast) _buildDividerWithInsertButton(context, note.order),
-              ],
+            return Container(
+              key: ValueKey(note.id),
+              width: double.infinity,
+              child: Column(
+                children: [
+                  NoteCard(
+                    note: note,
+                    onTap: () => _navigateToDetail(context, note),
+                  ),
+                  if (!isLast) _buildDividerWithInsertButton(context, note.order),
+                  if (isLast) const SizedBox(height: 8), // 末尾にも余白を追加
+                ],
+              ),
             );
           },
         );
@@ -116,6 +122,42 @@ class TimelineView extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => NoteEditorScreen(insertAfterOrder: insertAfterOrder),
       ),
+    );
+  }
+
+  void _reorderNotes(BuildContext context, List<Note> notes, int oldIndex, int newIndex) {
+    final noteService = Provider.of<NoteService>(context, listen: false);
+    final authService = Provider.of<AuthService>(context, listen: false);
+    
+    if (authService.userId == null) return;
+
+    // リストの順序変更に対応（newIndexが移動後の位置より大きくなる場合の調整）
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    // 新しいorder値を計算
+    double newOrder;
+    if (newIndex == 0) {
+      // 一番上に移動
+      newOrder = notes[0].order + 1000;
+    } else if (newIndex == notes.length - 1) {
+      // 一番下に移動
+      newOrder = notes[notes.length - 1].order - 1000;
+    } else {
+      // 中間に移動
+      final prevOrder = notes[newIndex].order;
+      final nextOrder = notes[newIndex + 1].order;
+      newOrder = (prevOrder + nextOrder) / 2;
+    }
+
+    final noteToUpdate = notes[oldIndex];
+    noteService.updateNote(
+      authService.userId!,
+      noteToUpdate.id,
+      noteToUpdate.content,
+      title: noteToUpdate.title,
+      newOrder: newOrder,
     );
   }
 

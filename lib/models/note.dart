@@ -1,5 +1,5 @@
 class Note {
-  final String id;
+  final String id; // UUID for unique identification
   final String? title; // タイトル（任意）
   final String content;
   final double order;

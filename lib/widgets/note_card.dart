@@ -26,7 +26,6 @@ class NoteCard extends StatelessWidget {
     return Card(
       child: InkWell(
         onTap: onTap,
-        onLongPress: () => _copyNoteContent(context),
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -62,7 +61,6 @@ class NoteCard extends StatelessWidget {
       child: Card(
         child: InkWell(
           onTap: onTap,
-          onLongPress: () => _copyNoteContent(context),
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(20),
@@ -182,19 +180,17 @@ class NoteCard extends StatelessWidget {
             ),
             const SizedBox(width: 12),
           ],
-          // コピーヒント
-          Icon(
-            Icons.content_copy,
-            size: 12,
-            color: Colors.grey[400],
-          ),
-          const SizedBox(width: 4),
-          Text(
-            'ロングタップでコピー',
-            style: TextStyle(
-              fontSize: 10,
-              color: Colors.grey[400],
-              fontFamily: 'NotoSansJP',
+          // コピーボタン
+          InkWell(
+            onTap: () => _copyNoteContent(context),
+            borderRadius: BorderRadius.circular(4),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              child: Icon(
+                Icons.content_copy,
+                size: 16,
+                color: Colors.grey[600],
+              ),
             ),
           ),
           const SizedBox(width: 8),
