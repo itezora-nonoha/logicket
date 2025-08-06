@@ -20,20 +20,84 @@ class AuthService extends ChangeNotifier {
       _user = user;
       _isInitialized = true;
       notifyListeners();
-      
-      // ユーザーがnullの場合のみ匿名ログインを試行
-      if (user == null && _isInitialized) {
-        _attemptAnonymousSignIn();
-      }
     });
   }
 
-  Future<void> _attemptAnonymousSignIn() async {
+  Future<UserCredential?> signInWithEmailAndPassword(String email, String password) async {
     try {
-      await signInAnonymously();
+      final UserCredential result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _user = result.user;
+      notifyListeners();
+      debugPrint('メールログイン成功: ${_user?.uid}');
+      return result;
     } catch (e) {
-      debugPrint('自動匿名ログイン失敗: $e');
-      // 必要に応じて再試行ロジックを追加
+      debugPrint('メールログインエラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserCredential?> createUserWithEmailAndPassword(String email, String password) async {
+    try {
+      final UserCredential result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      _user = result.user;
+      notifyListeners();
+      debugPrint('ユーザー作成成功: ${_user?.uid}');
+      return result;
+    } catch (e) {
+      debugPrint('ユーザー作成エラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> sendSignInLinkToEmail(String email) async {
+    try {
+      final actionCodeSettings = ActionCodeSettings(
+        url: 'https://logicket.firebaseapp.com/finishSignUp',
+        handleCodeInApp: true,
+        androidPackageName: 'com.example.logicket',
+        iOSBundleId: 'com.example.logicket',
+      );
+      
+      await _auth.sendSignInLinkToEmail(
+        email: email,
+        actionCodeSettings: actionCodeSettings,
+      );
+      debugPrint('サインインリンクを送信: $email');
+    } catch (e) {
+      debugPrint('サインインリンク送信エラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserCredential?> signInWithEmailLink(String email, String emailLink) async {
+    try {
+      final UserCredential result = await _auth.signInWithEmailLink(
+        email: email,
+        emailLink: emailLink,
+      );
+      _user = result.user;
+      notifyListeners();
+      debugPrint('メールリンクログイン成功: ${_user?.uid}');
+      return result;
+    } catch (e) {
+      debugPrint('メールリンクログインエラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      debugPrint('パスワードリセットメール送信: $email');
+    } catch (e) {
+      debugPrint('パスワードリセットメール送信エラー: $e');
+      rethrow;
     }
   }
 
@@ -45,6 +109,31 @@ class AuthService extends ChangeNotifier {
       debugPrint('匿名ログイン成功: ${_user?.uid}');
     } catch (e) {
       debugPrint('匿名ログインエラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateDisplayName(String displayName) async {
+    try {
+      await _user?.updateDisplayName(displayName);
+      await _user?.reload();
+      _user = _auth.currentUser;
+      notifyListeners();
+      debugPrint('表示名更新成功: $displayName');
+    } catch (e) {
+      debugPrint('表示名更新エラー: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> sendEmailVerification() async {
+    try {
+      if (_user != null && !_user!.emailVerified) {
+        await _user!.sendEmailVerification();
+        debugPrint('メール確認送信成功');
+      }
+    } catch (e) {
+      debugPrint('メール確認送信エラー: $e');
       rethrow;
     }
   }
