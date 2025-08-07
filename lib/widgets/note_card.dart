@@ -132,8 +132,8 @@ class NoteCard extends StatelessWidget {
           ),
           onTapLink: (text, href, title) {
             if (href?.startsWith('note://') == true) {
-              final noteId = href!.substring(7); // "note://" を除去
-              _handleNoteLink(context, noteId);
+              final linkHash = href!.substring(7); // "note://" を除去
+              _handleNoteLink(context, linkHash);
             }
           },
         ),
@@ -194,7 +194,7 @@ class NoteCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // ノートID
+          // ノートID（linkHash表示）
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
@@ -202,7 +202,7 @@ class NoteCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              'ID: ${_safeSubstring(note.id, 0, 8)}...',
+              'LinkID: ${note.linkHash}',
               style: TextStyle(
                 fontSize: 10,
                 color: Colors.grey[500],
@@ -322,12 +322,12 @@ class NoteCard extends StatelessWidget {
            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
   }
 
-  void _handleNoteLink(BuildContext context, String noteId) {
+  void _handleNoteLink(BuildContext context, String linkHash) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('リンク', style: TextStyle(fontFamily: 'NotoSansJP')),
-        content: Text('ノート "$noteId" への参照です', style: const TextStyle(fontFamily: 'NotoSansJP')),
+        content: Text('ノート "$linkHash" への参照です', style: const TextStyle(fontFamily: 'NotoSansJP')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),

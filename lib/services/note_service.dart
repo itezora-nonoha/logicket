@@ -1,21 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import '../models/note.dart';
 
 class NoteService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final List<Note> _notes = [];
+  final Uuid _uuid = const Uuid();
   bool _isLoading = false;
 
-  /// ユーザーID + タイムスタンプから6桁の英数字ハッシュIDを生成
-  String _generateNoteId(String userId) {
+  /// ユーザーID + タイムスタンプから6桁の英数字リンクハッシュを生成
+  String _generateLinkHash(String userId) {
     final timestamp = DateTime.now().millisecondsSinceEpoch.toString();
     final input = '$userId-$timestamp';
     final bytes = utf8.encode(input);
     final digest = _simpleHash(bytes);
     
-    // 英数字のみで6桁のIDを生成
+    // 英数字のみで6桁のリンクハッシュを生成
     const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
     var result = '';
     var hash = digest;
@@ -82,7 +84,8 @@ class NoteService extends ChangeNotifier {
     final now = DateTime.now();
     final sampleNotes = [
       Note(
-        id: _generateNoteId(userId),
+        id: _uuid.v4(),
+        linkHash: 'note01',
         title: 'ツェッテルカステンについて',
         content: '''# ツェッテルカステンとは
 
@@ -92,13 +95,14 @@ class NoteService extends ChangeNotifier {
 - ノート間のリンクで知識を関連付け
 - 創発的思考を促進
 
-[[note2]] も参照してください。''',
+[[note02]] も参照してください。''',
         order: 1000.0,
         createdAt: now.subtract(const Duration(hours: 2)),
         updatedAt: now.subtract(const Duration(hours: 2)),
       ),
       Note(
-        id: 'note2',
+        id: _uuid.v4(),
+        linkHash: 'note02',
         title: '創発的思考',
         content: '''## 創発的思考について
 
@@ -109,20 +113,21 @@ class NoteService extends ChangeNotifier {
 - 複雑系の性質
 - 非線形的な発展
 
-この概念は [[note3]] で詳しく説明しています。''',
+この概念は [[note03]] で詳しく説明しています。''',
         order: 999.0,
         createdAt: now.subtract(const Duration(hours: 1)),
         updatedAt: now.subtract(const Duration(hours: 1)),
       ),
       Note(
-        id: 'note3',
+        id: _uuid.v4(),
+        linkHash: 'note03',
         content: '''## 知識の関連付け
 
-\`\`\`
+```
 ノートA ← → ノートB
    ↓      ↗
 ノートC → ノートD
-\`\`\`
+```
 
 このような網目状の構造で知識を蓄積していきます。
 
@@ -169,7 +174,8 @@ class NoteService extends ChangeNotifier {
     }
 
     final note = Note(
-      id: _generateNoteId(userId),
+      id: _uuid.v4(),
+      linkHash: _generateLinkHash(userId),
       title: title,
       content: content,
       order: newOrder,
@@ -255,9 +261,19 @@ class NoteService extends ChangeNotifier {
     return _notes.where((note) => note.id == id && !note.isDeleted).firstOrNull;
   }
 
+  Note? getNoteByLinkHash(String linkHash) {
+    return _notes.where((note) => note.linkHash == linkHash && !note.isDeleted).firstOrNull;
+  }
+
   List<Note> getBacklinks(String noteId) {
     return _notes
         .where((note) => !note.isDeleted && note.linkedNotes.contains(noteId))
+        .toList();
+  }
+
+  List<Note> getBacklinksByLinkHash(String linkHash) {
+    return _notes
+        .where((note) => !note.isDeleted && note.linkedNotes.contains(linkHash))
         .toList();
   }
 

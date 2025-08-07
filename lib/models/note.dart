@@ -1,5 +1,6 @@
 class Note {
   final String id; // UUID for unique identification
+  final String linkHash; // 6-digit hash for linking
   final String? title; // タイトル（任意）
   final String content;
   final double order;
@@ -10,6 +11,7 @@ class Note {
 
   Note({
     required this.id,
+    required this.linkHash,
     this.title,
     required this.content,
     required this.order,
@@ -21,6 +23,7 @@ class Note {
 
   Note copyWith({
     String? id,
+    String? linkHash,
     String? title,
     String? content,
     double? order,
@@ -31,6 +34,7 @@ class Note {
   }) {
     return Note(
       id: id ?? this.id,
+      linkHash: linkHash ?? this.linkHash,
       title: title ?? this.title,
       content: content ?? this.content,
       order: order ?? this.order,
@@ -44,6 +48,7 @@ class Note {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'linkHash': linkHash,
       'title': title,
       'content': content,
       'order': order,
@@ -57,6 +62,7 @@ class Note {
   factory Note.fromMap(Map<String, dynamic> map) {
     return Note(
       id: map['id'] ?? '',
+      linkHash: map['linkHash'] ?? map['id'] ?? '', // Backward compatibility
       title: map['title'],
       content: map['content'] ?? '',
       order: (map['order'] ?? 0.0).toDouble(),

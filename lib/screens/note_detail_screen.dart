@@ -142,8 +142,8 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           ),
                           onTapLink: (text, href, title) {
                             if (href?.startsWith('note://') == true) {
-                              final noteId = href!.substring(7); // "note://" を除去
-                              _handleNoteLink(context, noteId);
+                              final linkHash = href!.substring(7); // "note://" を除去
+                              _handleNoteLink(context, linkHash);
                             }
                           },
                         ),
@@ -348,9 +348,9 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
     );
   }
 
-  void _handleNoteLink(BuildContext context, String noteId) {
+  void _handleNoteLink(BuildContext context, String linkHash) {
     final noteService = context.read<NoteService>();
-    final linkedNote = noteService.getNoteById(noteId);
+    final linkedNote = noteService.getNoteByLinkHash(linkHash);
     
     if (linkedNote != null) {
       _navigateToNote(context, linkedNote);
@@ -363,7 +363,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
             style: TextStyle(fontFamily: 'NotoSansJP'),
           ),
           content: Text(
-            'ノート "$noteId" が見つかりません',
+            'ノート "$linkHash" が見つかりません',
             style: const TextStyle(fontFamily: 'NotoSansJP'),
           ),
           actions: [
