@@ -169,6 +169,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
+                        if (_currentNote.inspirationDate != null) ...[
+                          _buildMetaRow(Icons.lightbulb_outline, '発想日', _formatDateTime(_currentNote.inspirationDate!)),
+                          const SizedBox(height: 8),
+                        ],
                         _buildMetaRow(Icons.schedule, '作成日時', _formatDateTime(_currentNote.createdAt)),
                         const SizedBox(height: 8),
                         _buildMetaRow(Icons.update, '更新日時', _formatDateTime(_currentNote.updatedAt)),

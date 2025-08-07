@@ -149,7 +149,7 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  Future<void> createNote(String userId, String content, {String? title, double? insertAfterOrder}) async {
+  Future<void> createNote(String userId, String content, {String? title, DateTime? inspirationDate, double? insertAfterOrder}) async {
     if (userId.isEmpty) return;
 
     final now = DateTime.now();
@@ -178,6 +178,7 @@ class NoteService extends ChangeNotifier {
       linkHash: _generateLinkHash(userId),
       title: title,
       content: content,
+      inspirationDate: inspirationDate,
       order: newOrder,
       linkedNotes: _extractLinkedNotes(content),
       createdAt: now,
@@ -200,7 +201,7 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  Future<void> updateNote(String userId, String id, String content, {String? title, double? newOrder}) async {
+  Future<void> updateNote(String userId, String id, String content, {String? title, DateTime? inspirationDate, double? newOrder}) async {
     if (userId.isEmpty) return;
 
     final index = _notes.indexWhere((note) => note.id == id);
@@ -208,6 +209,7 @@ class NoteService extends ChangeNotifier {
       final updatedNote = _notes[index].copyWith(
         title: title,
         content: content,
+        inspirationDate: inspirationDate ?? _notes[index].inspirationDate,
         order: newOrder ?? _notes[index].order,
         linkedNotes: _extractLinkedNotes(content),
         updatedAt: DateTime.now(),

@@ -3,6 +3,7 @@ class Note {
   final String linkHash; // 6-digit hash for linking
   final String? title; // タイトル（任意）
   final String content;
+  final DateTime? inspirationDate; // 発想日（編集可能）
   final double order;
   final List<String> linkedNotes;
   final DateTime createdAt;
@@ -14,6 +15,7 @@ class Note {
     required this.linkHash,
     this.title,
     required this.content,
+    this.inspirationDate,
     required this.order,
     this.linkedNotes = const [],
     required this.createdAt,
@@ -26,6 +28,7 @@ class Note {
     String? linkHash,
     String? title,
     String? content,
+    DateTime? inspirationDate,
     double? order,
     List<String>? linkedNotes,
     DateTime? createdAt,
@@ -37,6 +40,7 @@ class Note {
       linkHash: linkHash ?? this.linkHash,
       title: title ?? this.title,
       content: content ?? this.content,
+      inspirationDate: inspirationDate ?? this.inspirationDate,
       order: order ?? this.order,
       linkedNotes: linkedNotes ?? this.linkedNotes,
       createdAt: createdAt ?? this.createdAt,
@@ -51,6 +55,7 @@ class Note {
       'linkHash': linkHash,
       'title': title,
       'content': content,
+      'inspirationDate': inspirationDate?.millisecondsSinceEpoch,
       'order': order,
       'linkedNotes': linkedNotes,
       'createdAt': createdAt.millisecondsSinceEpoch,
@@ -65,6 +70,9 @@ class Note {
       linkHash: map['linkHash'] ?? map['id'] ?? '', // Backward compatibility
       title: map['title'],
       content: map['content'] ?? '',
+      inspirationDate: map['inspirationDate'] != null 
+          ? DateTime.fromMillisecondsSinceEpoch(map['inspirationDate']) 
+          : null,
       order: (map['order'] ?? 0.0).toDouble(),
       linkedNotes: List<String>.from(map['linkedNotes'] ?? []),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),

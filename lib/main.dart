@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'models/note.dart';
 import 'services/note_service.dart';
 import 'screens/auth_wrapper.dart';
 import 'services/auth_service.dart';
@@ -36,6 +36,16 @@ class LogicketApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Logicket',
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('ja', 'JP'),
+          Locale('en', 'US'),
+        ],
+        locale: const Locale('ja', 'JP'),
         theme: ThemeData(
           primarySwatch: _createMaterialColor(const Color(0xFF33A6B8)),
           primaryColor: const Color(0xFF33A6B8),

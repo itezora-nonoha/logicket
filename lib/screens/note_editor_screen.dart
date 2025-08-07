@@ -21,6 +21,7 @@ class NoteEditorScreen extends StatefulWidget {
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
+  DateTime? _inspirationDate;
   bool _isLoading = false;
 
   @override
@@ -28,6 +29,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     super.initState();
     _titleController = TextEditingController(text: widget.note?.title ?? '');
     _contentController = TextEditingController(text: widget.note?.content ?? '');
+    _inspirationDate = widget.note?.inspirationDate;
   }
 
   @override
@@ -109,6 +111,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             // タイトル入力欄
             TextField(
               controller: _titleController,
+              autocorrect: false,
+              enableSuggestions: false,
+              textInputAction: TextInputAction.next,
+              keyboardType: TextInputType.text,
               decoration: const InputDecoration(
                 labelText: 'タイトル（任意）',
                 hintText: 'ノートのタイトルを入力...',
@@ -125,12 +131,46 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             
             const SizedBox(height: 16),
             
+            // 発想日入力欄
+            InkWell(
+              onTap: _selectInspirationDate,
+              borderRadius: BorderRadius.circular(4),
+              child: InputDecorator(
+                decoration: const InputDecoration(
+                  labelText: '発想日（任意）',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  contentPadding: EdgeInsets.all(16),
+                  suffixIcon: Icon(Icons.calendar_today),
+                ),
+                child: Text(
+                  _inspirationDate != null
+                      ? _formatDate(_inspirationDate!)
+                      : '発想した日を選択...',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'NotoSansJP',
+                    color: _inspirationDate != null 
+                        ? Colors.black87 
+                        : Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 16),
+            
             // 本文入力欄
             Expanded(
               child: TextField(
                 controller: _contentController,
                 maxLines: null,
                 expands: true,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
                   labelText: '本文',
                   hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
@@ -195,6 +235,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           userId,
           _contentController.text.trim(),
           title: title,
+          inspirationDate: _inspirationDate,
           insertAfterOrder: widget.insertAfterOrder,
         );
       } else {
@@ -204,6 +245,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
           widget.note!.id, 
           _contentController.text.trim(),
           title: title,
+          inspirationDate: _inspirationDate,
         );
       }
 
@@ -232,5 +274,24 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     } finally {
       setState(() => _isLoading = false);
     }
+  }
+
+  Future<void> _selectInspirationDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _inspirationDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    
+    if (picked != null && picked != _inspirationDate) {
+      setState(() {
+        _inspirationDate = picked;
+      });
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    return '${date.year}/${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}';
   }
 }
