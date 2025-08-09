@@ -194,11 +194,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 //   height: 1.0,           // 行高を厳密に制御
                 //   forceStrutHeight: true, // 強制的に統一
                 // ),
-                // style: const TextStyle(
-                //   fontSize: 16,
-                //   height: 1.0,
-                //   fontFamily: 'NotoSansJP',
-                // ),
+                style: const TextStyle(
+                  fontSize: 14,
+                  height: 1.0,
+                  wordSpacing: 1.0,
+                  fontFamily: 'NotoSansJP',
+                ),
               ),
             ),
             const SizedBox(height: 16),
