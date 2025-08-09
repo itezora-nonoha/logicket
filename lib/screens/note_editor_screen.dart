@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/note_service.dart';
@@ -163,6 +165,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             // 本文入力欄
             Expanded(
               child: TextField(
+                selectionHeightStyle: ui.BoxHeightStyle.max,
+                selectionWidthStyle: ui.BoxWidthStyle.max,
                 controller: _contentController,
                 maxLines: null,
                 expands: true,
