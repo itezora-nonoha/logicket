@@ -165,8 +165,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             // 本文入力欄
             Expanded(
               child: TextField(
-                selectionHeightStyle: ui.BoxHeightStyle.max,
-                selectionWidthStyle: ui.BoxWidthStyle.max,
+                selectionHeightStyle: ui.BoxHeightStyle.strut,
+                // selectionWidthStyle: ui.BoxWidthStyle.max,
                 controller: _contentController,
                 maxLines: null,
                 expands: true,
@@ -179,9 +179,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
-                  labelText: '本文',
+                  labelText: '本文 23:31',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                  hintText: 'マークダウン記法が使用できます 23:27',
+                  hintText: 'マークダウン記法が使用できます',
                   border: OutlineInputBorder(),
                   labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
