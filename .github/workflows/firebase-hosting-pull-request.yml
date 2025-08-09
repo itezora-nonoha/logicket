@@ -13,9 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: ls ./web
+      - run: ls ./lib
       - name: Loading Secret API Key
-        run: sed -i -e 's/{$firebaseAppConfigKey}/${{ secrets.FIREBASE_APP_CONFIG_APIKEY }}/' ./lib/main.dart
+        run: sed -i -e 's/{firebaseAppConfigKey}/${{ secrets.FIREBASE_APP_CONFIG_APIKEY }}/' ./lib/main.dart
       - run: cat ./lib/main.dart
       - uses: subosito/flutter-action@v2
         with:
