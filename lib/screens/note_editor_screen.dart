@@ -164,36 +164,36 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             Expanded(
               child: TextField(
                 controller: _contentController,
-                maxLines: null,
-                expands: true,
-                // expands: false,
-                // maxLines: 15,        // 固定の最大行数
-                // minLines: 8,         // 固定の最小行数
+                // maxLines: null,
+                // expands: true,
+                expands: false,
+                maxLines: 15,        // 固定の最大行数
+                minLines: 8,         // 固定の最小行数
                 autocorrect: false,
                 enableSuggestions: false,
-                keyboardType: TextInputType.text, // 変えてみる
+                keyboardType: TextInputType.multiline, // 変えてみる
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
                   labelText: '本文',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                  hintText: 'マークダウン記法が使用できます 22:33',
+                  hintText: 'マークダウン記法が使用できます 22:39',
                   border: OutlineInputBorder(),
                   labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   contentPadding: EdgeInsets.all(16),
                   alignLabelWithHint: true,
                 ),
-                // strutStyle: const StrutStyle(
-                //   fontFamily: 'NotoSansJP',
-                //   height: 1.0,           // 行高を厳密に制御
-                //   forceStrutHeight: true, // 強制的に統一
-                // ),
-                style: const TextStyle(
-                  fontSize: 16, // 変えてみる
-                  height: 1.0,
+                strutStyle: const StrutStyle(
                   fontFamily: 'NotoSansJP',
+                  height: 1.0,           // 行高を厳密に制御
+                  forceStrutHeight: true, // 強制的に統一
                 ),
+                // style: const TextStyle(
+                //   fontSize: 16, // 変えてみる
+                //   height: 1.0,
+                //   fontFamily: 'NotoSansJP',
+                // ),
               ),
             ),
             const SizedBox(height: 16),
