@@ -167,17 +167,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               child: TextFormField(
                 controller: _contentController,
                 // maxLines: null,
-                expands: true,
-                // expands: false,
-                // maxLines: 15,        // 固定の最大行数
-                // minLines: 8,         // 固定の最小行数
+                // expands: true,
+                expands: false,
+                maxLines: 15,        // 固定の最大行数
+                minLines: 1,         // 固定の最小行数
                 // autocorrect: false,
                 // enableSuggestions: false,
                 // keyboardType: TextInputType.multiline, // 変えてみる
                 // textInputAction: TextInputAction.newline,
                 // textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
-                  labelText: '本文 23:39',
+                  labelText: '本文 00:04',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
                   hintText: 'マークダウン記法が使用できます',
                   border: OutlineInputBorder(),
