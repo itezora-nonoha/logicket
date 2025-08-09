@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/note_service.dart';
@@ -165,11 +164,19 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             
             // 本文入力欄
             Expanded(
-              child:   CupertinoTextField.borderless(
-    controller: _contentController,
-    maxLines: null,
-    // Cupertino特有のプロパティ
-  )
+              child: TextFormField(
+                controller: _contentController,
+                decoration: const InputDecoration(
+                  labelText: '本文 23:54',
+                  // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
+                  hintText: 'マークダウン記法が使用できます',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  contentPadding: EdgeInsets.all(16),
+                  // alignLabelWithHint: true,
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             SizedBox(
