@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/note_service.dart';
@@ -162,38 +164,41 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             
             // 本文入力欄
             Expanded(
-              child: TextField(
+              child: TextFormField(
                 controller: _contentController,
                 // maxLines: null,
                 // expands: true,
                 expands: false,
                 maxLines: 15,        // 固定の最大行数
-                minLines: 8,         // 固定の最小行数
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                textCapitalization: TextCapitalization.none,
+                minLines: 1,         // 固定の最小行数
+                // autocorrect: false,
+                // enableSuggestions: false,
+                // keyboardType: TextInputType.multiline, // 変えてみる
+                // textInputAction: TextInputAction.newline,
+                // textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
-                  labelText: '本文',
+                  labelText: '本文 00:04',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                  hintText: 'マークダウン記法が使用できます 22:07',
-                  border: OutlineInputBorder(),
+                  hintText: 'マークダウン記法が使用できます',
+                  // border: OutlineInputBorder(),
                   labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: EdgeInsets.all(0),
-                  alignLabelWithHint: true,
+                  contentPadding: EdgeInsets.all(16),
+                  // alignLabelWithHint: true,
                 ),
                 // strutStyle: const StrutStyle(
+                //   fontSize: 16,
                 //   fontFamily: 'NotoSansJP',
                 //   height: 1.0,           // 行高を厳密に制御
                 //   forceStrutHeight: true, // 強制的に統一
                 // ),
-                style: const TextStyle(
-                  fontSize: 16,
-                  // height: 1.5,
-                  fontFamily: 'NotoSansJP',
-                ),
+                // style: const TextStyle(
+                //   fontSize: 16,
+                //   height: 1.0,
+                //   wordSpacing: 1.0,
+                //   letterSpacing: 1.0,
+                //   fontFamily: 'NotoSansJP',
+                // ),
               ),
             ),
             const SizedBox(height: 16),
