@@ -10,7 +10,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: const FirebaseOptions(
-      apiKey: "{firebaseAppConfigKey}",
+      apiKey: "AIzaSyAQx1zBGoKv-yKPkbnL93cv2L6MjILoR8E",
+      // apiKey: "{firebaseAppConfigKey}",
       authDomain: "logicket.firebaseapp.com",
       projectId: "logicket",
       storageBucket: "logicket.appspot.com",
