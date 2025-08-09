@@ -181,7 +181,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 decoration: const InputDecoration(
                   labelText: '本文',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                  hintText: 'マークダウン記法が使用できます 23:07',
+                  hintText: 'マークダウン記法が使用できます 23:22',
                   border: OutlineInputBorder(),
                   labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
@@ -195,9 +195,10 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 //   forceStrutHeight: true, // 強制的に統一
                 // ),
                 style: const TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   height: 1.0,
                   wordSpacing: 1.0,
+                  letterSpacing: 1.0,
                   fontFamily: 'NotoSansJP',
                 ),
               ),
