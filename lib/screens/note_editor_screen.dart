@@ -76,9 +76,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
+          child: Column(
+            children: [
                 if (widget.insertAfterOrder != null)
                   Container(
                     width: double.infinity,
@@ -163,79 +162,51 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 
                 const SizedBox(height: 16),
                 
-                // 本文入力欄
-                Container(
-                  constraints: BoxConstraints(
-                    minHeight: 300,
-                    maxHeight: MediaQuery.of(context).size.height * 0.5,
+              // 本文入力欄 - Expandedで余った高さを占有
+              Expanded(
+                child: TextField(
+                  controller: _contentController,
+                  maxLines: null,
+                  expands: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardType: TextInputType.multiline,
+                  textInputAction: TextInputAction.newline,
+                  textCapitalization: TextCapitalization.none,
+                  scrollPadding: const EdgeInsets.only(bottom: 80),
+                  decoration: const InputDecoration(
+                    labelText: '本文',
+                    hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                    hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                    contentPadding: EdgeInsets.all(16),
+                    alignLabelWithHint: true,
                   ),
-                  child: TextField(
-                    controller: _contentController,
-                    maxLines: null,
-                    minLines: 15,
-                    autocorrect: false,
-                    enableSuggestions: false,
-                    enableInteractiveSelection: true,
-                    keyboardType: TextInputType.multiline,
-                    textInputAction: TextInputAction.newline,
-                    textCapitalization: TextCapitalization.none,
-                    scrollPadding: const EdgeInsets.only(bottom: 200),
-                    smartDashesType: SmartDashesType.disabled,
-                    smartQuotesType: SmartQuotesType.disabled,
-                    decoration: const InputDecoration(
-                      labelText: '本文',
-                      hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                      border: OutlineInputBorder(),
-                      labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                      hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                      contentPadding: EdgeInsets.all(16),
-                      alignLabelWithHint: true,
-                    ),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      height: 1.5,
-                      fontFamily: 'NotoSansJP',
-                    ),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    height: 1.5,
+                    fontFamily: 'NotoSansJP',
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).viewInsets.bottom > 0 ? 0 : 16),
-                if (MediaQuery.of(context).viewInsets.bottom == 0)
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _isLoading ? null : _saveNote,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
-                      ),
-                      child: Text(_isLoading ? '保存中...' : '保存'),
-                    ),
+              ),
+              const SizedBox(height: 16),
+              // 保存ボタン - 最下部に固定
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _saveNote,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
                   ),
-              ],
-            ),
+                  child: Text(_isLoading ? '保存中...' : '保存'),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      floatingActionButton: MediaQuery.of(context).viewInsets.bottom > 0
-          ? FloatingActionButton.extended(
-              onPressed: _isLoading ? null : _saveNote,
-              icon: _isLoading 
-                  ? const SizedBox(
-                      width: 20, 
-                      height: 20, 
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2, 
-                        color: Colors.white,
-                      ),
-                    )
-                  : const Icon(Icons.save),
-              label: Text(
-                _isLoading ? '保存中' : '保存',
-                style: const TextStyle(fontFamily: 'NotoSansJP'),
-              ),
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
