@@ -171,17 +171,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 minLines: 8,         // 固定の最小行数
                 autocorrect: false,
                 enableSuggestions: false,
-                keyboardType: TextInputType.multiline,
+                keyboardType: TextInputType.text, // 変えてみる
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
                 decoration: const InputDecoration(
                   labelText: '本文',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
-                  hintText: 'マークダウン記法が使用できます 22:07',
+                  hintText: 'マークダウン記法が使用できます 22:20',
                   border: OutlineInputBorder(),
                   labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
                   hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: EdgeInsets.all(0),
+                  contentPadding: EdgeInsets.all(16),
                   alignLabelWithHint: true,
                 ),
                 // strutStyle: const StrutStyle(
@@ -190,7 +190,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 //   forceStrutHeight: true, // 強制的に統一
                 // ),
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 16, // 変えてみる
                   // height: 1.5,
                   fontFamily: 'NotoSansJP',
                 ),
