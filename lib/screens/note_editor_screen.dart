@@ -30,13 +30,54 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _titleController = TextEditingController(text: widget.note?.title ?? '');
     _contentController = TextEditingController(text: widget.note?.content ?? '');
     _inspirationDate = widget.note?.inspirationDate;
+    
+    // 初期テキストを保存
+    _previousText = _contentController.text;
+    
+    // テキスト変更リスナーを追加
+    _contentController.addListener(_onTextChanged);
   }
 
   @override
   void dispose() {
+    _contentController.removeListener(_onTextChanged);
     _titleController.dispose();
     _contentController.dispose();
     super.dispose();
+  }
+
+  String _previousText = '';
+
+  void _onTextChanged() {
+    final currentText = _contentController.text;
+    final selection = _contentController.selection;
+    
+    // テキストが変更され、改行が追加されたかチェック
+    if (currentText.length > _previousText.length && 
+        currentText.endsWith('\n') && 
+        selection.isValid) {
+      
+      final cursorPosition = selection.baseOffset;
+      
+      // 改行の直前の行を取得
+      final beforeNewline = currentText.substring(0, cursorPosition - 1);
+      final lastNewlineIndex = beforeNewline.lastIndexOf('\n');
+      final previousLineStart = lastNewlineIndex == -1 ? 0 : lastNewlineIndex + 1;
+      final previousLine = beforeNewline.substring(previousLineStart);
+      
+      // 前の行が箇条書き形式（"- "で始まる）かチェック
+      if (previousLine.startsWith('- ')) {
+        // 箇条書きマーカーを自動挿入
+        final newText = '${currentText}- ';
+        
+        _contentController.text = newText;
+        _contentController.selection = TextSelection.collapsed(
+          offset: newText.length,
+        );
+      }
+    }
+    
+    _previousText = currentText;
   }
 
   @override
