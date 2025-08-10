@@ -169,7 +169,7 @@ class ArchivedNotesScreen extends StatelessWidget {
                     Icon(Icons.lightbulb_outline, size: 14, color: Colors.grey[600]),
                     const SizedBox(width: 4),
                     Text(
-                      '発想: ${_formatDateTime(note.inspirationDate!)}',
+                      '発想: ${_formatDate(note.inspirationDate!)}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -199,6 +199,10 @@ class ArchivedNotesScreen extends StatelessWidget {
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')} '
            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}';
   }
 
   void _navigateToNoteDetail(BuildContext context, Note note) {

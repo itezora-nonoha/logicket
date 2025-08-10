@@ -240,11 +240,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       
       if (widget.note == null) {
         // 新規作成
+        // 発想日が空の場合は作成日を設定
+        final DateTime inspirationDate = _inspirationDate ?? DateTime.now();
         await noteService.createNote(
           userId,
           _contentController.text.trim(),
           title: title,
-          inspirationDate: _inspirationDate,
+          inspirationDate: inspirationDate,
           insertAfterOrder: widget.insertAfterOrder,
         );
       } else {

@@ -188,7 +188,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                         ),
                         const SizedBox(height: 12),
                         if (_currentNote.inspirationDate != null) ...[
-                          _buildMetaRow(Icons.lightbulb_outline, '発想日', _formatDateTime(_currentNote.inspirationDate!)),
+                          _buildMetaRow(Icons.lightbulb_outline, '発想日', _formatDate(_currentNote.inspirationDate!)),
                           const SizedBox(height: 8),
                         ],
                         _buildMetaRow(Icons.schedule, '作成日時', _formatDateTime(_currentNote.createdAt)),
@@ -337,6 +337,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
   String _formatDateTime(DateTime dateTime) {
     return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')} '
            '${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _formatDate(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}';
   }
 
   void _navigateToEditor(BuildContext context) async {
