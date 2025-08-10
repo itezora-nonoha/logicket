@@ -1,0 +1,15 @@
+{
+    "dart.flutterSdkPath": null,
+    "dart.debugExternalLibraries": false,
+    "dart.debugSdkLibraries": false,
+    "dart.flutterRunLogFile": null,
+    "dart.flutterTestLogFile": null,
+    "dart.openDevTools": "flutter",
+    "dart.warnWhenEditingFilesOutsideWorkspace": true,
+    "dart.allowAnalytics": false,
+    "dart.flutterCreateAndroidLanguage": "kotlin",
+    "dart.flutterCreateIOSLanguage": "swift",
+    "files.associations": {
+        "*.dart": "dart"
+    }
+}
