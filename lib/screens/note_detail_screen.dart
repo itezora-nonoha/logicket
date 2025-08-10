@@ -47,11 +47,29 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ),
               PopupMenuButton<String>(
                 onSelected: (value) {
-                  if (value == 'delete') {
+                  if (value == 'archive') {
+                    _showArchiveDialog(context);
+                  } else if (value == 'delete') {
                     _showDeleteDialog(context);
                   }
                 },
                 itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: 'archive',
+                    child: Row(
+                      children: [
+                        Icon(Icons.archive, color: Colors.orange[700]),
+                        const SizedBox(width: 8),
+                        Text(
+                          'アーカイブ',
+                          style: TextStyle(
+                            color: Colors.orange[700],
+                            fontFamily: 'NotoSansJP',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const PopupMenuItem(
                     value: 'delete',
                     child: Row(
@@ -382,6 +400,54 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
         ),
       );
     }
+  }
+
+  void _showArchiveDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          'ノートをアーカイブ',
+          style: TextStyle(fontFamily: 'NotoSansJP'),
+        ),
+        content: const Text(
+          'このノートをアーカイブしますか？アーカイブしたノートはアーカイブ画面から確認できます。',
+          style: TextStyle(fontFamily: 'NotoSansJP'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text(
+              'キャンセル',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              final authService = context.read<AuthService>();
+              await context.read<NoteService>().archiveNote(authService.userId!, _currentNote.id);
+              if (context.mounted) {
+                Navigator.of(context).pop(); // ダイアログを閉じる
+                Navigator.of(context).pop(); // 詳細画面を閉じる
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'ノートをアーカイブしました',
+                      style: TextStyle(fontFamily: 'NotoSansJP'),
+                    ),
+                  ),
+                );
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.orange[700]),
+            child: const Text(
+              'アーカイブ',
+              style: TextStyle(fontFamily: 'NotoSansJP'),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showDeleteDialog(BuildContext context) {

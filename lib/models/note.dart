@@ -9,6 +9,7 @@ class Note {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isDeleted;
+  final bool isArchived;
 
   Note({
     required this.id,
@@ -21,6 +22,7 @@ class Note {
     required this.createdAt,
     required this.updatedAt,
     this.isDeleted = false,
+    this.isArchived = false,
   });
 
   Note copyWith({
@@ -34,6 +36,7 @@ class Note {
     DateTime? createdAt,
     DateTime? updatedAt,
     bool? isDeleted,
+    bool? isArchived,
   }) {
     return Note(
       id: id ?? this.id,
@@ -46,6 +49,7 @@ class Note {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       isDeleted: isDeleted ?? this.isDeleted,
+      isArchived: isArchived ?? this.isArchived,
     );
   }
 
@@ -61,6 +65,7 @@ class Note {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'updatedAt': updatedAt.millisecondsSinceEpoch,
       'isDeleted': isDeleted,
+      'isArchived': isArchived,
     };
   }
 
@@ -78,6 +83,7 @@ class Note {
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
       updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
       isDeleted: map['isDeleted'] ?? false,
+      isArchived: map['isArchived'] ?? false,
     );
   }
 

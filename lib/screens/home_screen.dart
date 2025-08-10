@@ -5,9 +5,9 @@ import '../services/auth_service.dart';
 import '../widgets/timeline_view.dart';
 import '../widgets/responsive_layout.dart';
 import 'note_editor_screen.dart';
-import 'note_detail_screen.dart';
 import 'settings_screen.dart';
 import 'user_profile_screen.dart';
+import 'archived_notes_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _pages = [
     const TimelineView(),
-    const Center(child: Text('Search')),
+    const _SearchPage(),
     const SettingsScreen(),
   ];
 
@@ -322,5 +322,69 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     
     return (words[0].substring(0, 1) + words[1].substring(0, 1)).toUpperCase();
+  }
+}
+
+class _SearchPage extends StatelessWidget {
+  const _SearchPage();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'ノートの管理',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              fontFamily: 'NotoSansJP',
+            ),
+          ),
+          const SizedBox(height: 16),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.archive, color: Colors.orange[700]),
+              title: const Text(
+                'アーカイブ',
+                style: TextStyle(fontFamily: 'NotoSansJP'),
+              ),
+              subtitle: const Text(
+                'アーカイブされたノートを確認',
+                style: TextStyle(fontFamily: 'NotoSansJP'),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              onTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const ArchivedNotesScreen(),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+          Card(
+            child: ListTile(
+              leading: Icon(Icons.search, color: Colors.blue[700]),
+              title: const Text(
+                'ノート検索',
+                style: TextStyle(fontFamily: 'NotoSansJP'),
+              ),
+              subtitle: const Text(
+                'ノートの内容を検索（準備中）',
+                style: TextStyle(fontFamily: 'NotoSansJP'),
+              ),
+              trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+              enabled: false,
+              onTap: () {
+                // TODO: 検索機能を実装
+              },
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

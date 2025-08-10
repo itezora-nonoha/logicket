@@ -40,8 +40,14 @@ class NoteService extends ChangeNotifier {
   }
 
   List<Note> get notes {
-    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted).toList();
+    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && !note.isArchived).toList();
     sortedNotes.sort((a, b) => b.order.compareTo(a.order)); // 降順（新しいものが上）
+    return sortedNotes;
+  }
+
+  List<Note> get archivedNotes {
+    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && note.isArchived).toList();
+    sortedNotes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt)); // 降順（新しくアーカイブされたものが上）
     return sortedNotes;
   }
 
@@ -267,15 +273,69 @@ class NoteService extends ChangeNotifier {
     return _notes.where((note) => note.linkHash == linkHash && !note.isDeleted).firstOrNull;
   }
 
+  Future<void> archiveNote(String userId, String id) async {
+    if (userId.isEmpty) return;
+
+    final index = _notes.indexWhere((note) => note.id == id);
+    if (index != -1) {
+      final archivedNote = _notes[index].copyWith(
+        isArchived: true,
+        updatedAt: DateTime.now(),
+      );
+
+      try {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notes')
+            .doc(id)
+            .update({'isArchived': true, 'updatedAt': FieldValue.serverTimestamp()});
+
+        _notes[index] = archivedNote;
+        notifyListeners();
+      } catch (e) {
+        debugPrint('ノートアーカイブエラー: $e');
+        rethrow;
+      }
+    }
+  }
+
+  Future<void> unarchiveNote(String userId, String id) async {
+    if (userId.isEmpty) return;
+
+    final index = _notes.indexWhere((note) => note.id == id);
+    if (index != -1) {
+      final unarchivedNote = _notes[index].copyWith(
+        isArchived: false,
+        updatedAt: DateTime.now(),
+      );
+
+      try {
+        await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('notes')
+            .doc(id)
+            .update({'isArchived': false, 'updatedAt': FieldValue.serverTimestamp()});
+
+        _notes[index] = unarchivedNote;
+        notifyListeners();
+      } catch (e) {
+        debugPrint('ノートアーカイブ解除エラー: $e');
+        rethrow;
+      }
+    }
+  }
+
   List<Note> getBacklinks(String noteId) {
     return _notes
-        .where((note) => !note.isDeleted && note.linkedNotes.contains(noteId))
+        .where((note) => !note.isDeleted && !note.isArchived && note.linkedNotes.contains(noteId))
         .toList();
   }
 
   List<Note> getBacklinksByLinkHash(String linkHash) {
     return _notes
-        .where((note) => !note.isDeleted && note.linkedNotes.contains(linkHash))
+        .where((note) => !note.isDeleted && !note.isArchived && note.linkedNotes.contains(linkHash))
         .toList();
   }
 
