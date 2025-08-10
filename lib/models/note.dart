@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Note {
   final String id; // UUID for unique identification
   final String linkHash; // 6-digit hash for linking
@@ -76,15 +78,27 @@ class Note {
       title: map['title'],
       content: map['content'] ?? '',
       inspirationDate: map['inspirationDate'] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map['inspirationDate']) 
+          ? _convertToDateTime(map['inspirationDate']) 
           : null,
       order: (map['order'] ?? 0.0).toDouble(),
       linkedNotes: List<String>.from(map['linkedNotes'] ?? []),
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? 0),
-      updatedAt: DateTime.fromMillisecondsSinceEpoch(map['updatedAt'] ?? 0),
+      createdAt: _convertToDateTime(map['createdAt']) ?? DateTime.now(),
+      updatedAt: _convertToDateTime(map['updatedAt']) ?? DateTime.now(),
       isDeleted: map['isDeleted'] ?? false,
       isArchived: map['isArchived'] ?? false,
     );
+  }
+
+  // FirestoreのTimestamp型またはint型をDateTimeに変換するヘルパーメソッド
+  static DateTime? _convertToDateTime(dynamic value) {
+    if (value == null) return null;
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+    return null;
   }
 
   // 表示用のタイトルを取得（タイトルがない場合は本文の最初の行から生成）

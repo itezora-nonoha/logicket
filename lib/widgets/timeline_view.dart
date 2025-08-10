@@ -2,14 +2,70 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../screens/note_detail_screen.dart';
 import '../screens/note_editor_screen.dart';
+import '../screens/note_merging_screen.dart';
 import '../services/note_service.dart';
 import '../services/auth_service.dart';
 import '../models/note.dart';
 import 'note_card.dart';
 
 
-class TimelineView extends StatelessWidget {
+class TimelineView extends StatefulWidget {
   const TimelineView({super.key});
+
+  @override
+  State<TimelineView> createState() => TimelineViewState();
+}
+
+class TimelineViewState extends State<TimelineView> {
+  bool _isSelectionMode = false;
+  final Set<String> _selectedNoteIds = {};
+
+  void toggleSelectionMode() {
+    setState(() {
+      _isSelectionMode = !_isSelectionMode;
+      if (!_isSelectionMode) {
+        _selectedNoteIds.clear();
+      }
+    });
+  }
+
+  void _toggleNoteSelection(String noteId) {
+    setState(() {
+      if (_selectedNoteIds.contains(noteId)) {
+        _selectedNoteIds.remove(noteId);
+      } else {
+        _selectedNoteIds.add(noteId);
+      }
+    });
+  }
+
+  void _navigateToMergingScreen(List<Note> notes) {
+    if (_selectedNoteIds.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            '2件以上のノートを選択してください',
+            style: TextStyle(fontFamily: 'NotoSansJP'),
+          ),
+        ),
+      );
+      return;
+    }
+
+    final selectedNotes = notes.where((note) => _selectedNoteIds.contains(note.id)).toList();
+    
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => NoteMergingScreen(selectedNotes: selectedNotes),
+      ),
+    ).then((_) {
+      // まとめ画面から戻ったら選択モードを終了
+      setState(() {
+        _isSelectionMode = false;
+        _selectedNoteIds.clear();
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,36 +79,149 @@ class TimelineView extends StatelessWidget {
 
         final notes = noteService.notes;
         
+        // デバッグ用：ノート数を確認
+        debugPrint('TimelineView: 全体で${noteService.notes.length}件、表示対象${notes.length}件');
+        
         if (notes.isEmpty) {
           return const Center(
             child: Text('ノートがありません\n「+」ボタンで新しいノートを作成しましょう'),
           );
         }
+        
 
-        return ReorderableListView.builder(
-          padding: const EdgeInsets.all(16),
-          itemCount: notes.length,
-          onReorder: (oldIndex, newIndex) => _reorderNotes(context, notes, oldIndex, newIndex),
-          itemBuilder: (context, index) {
-            final note = notes[index];
-            final isLast = index == notes.length - 1;
-            
-            return Container(
-              key: ValueKey(note.id),
-              width: double.infinity,
-              child: Column(
-                children: [
-                  NoteCard(
-                    note: note,
-                    onTap: () => _navigateToDetail(context, note),
+        final mainContent = Column(
+          children: [
+            // 選択モード時のヘッダー
+            if (_isSelectionMode)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.08),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
-                  if (!isLast) _buildDividerWithInsertButton(context, note.order),
-                  if (isLast) const SizedBox(height: 8), // 末尾にも余白を追加
-                ],
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.merge_type,
+                      size: 16,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      _selectedNoteIds.isEmpty 
+                          ? 'まとめたいノートを選択してください'
+                          : '${_selectedNoteIds.length}件選択中',
+                      style: TextStyle(
+                        color: Theme.of(context).primaryColor,
+                        fontSize: 14,
+                        fontFamily: 'NotoSansJP',
+                      ),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isSelectionMode = false;
+                          _selectedNoteIds.clear();
+                        });
+                      },
+                      child: Text(
+                        'キャンセル',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontFamily: 'NotoSansJP',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            );
-          },
+            
+            // メインのリスト
+            Expanded(
+              child: _isSelectionMode
+                  ? ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: notes.length,
+                      itemBuilder: (context, index) {
+                        debugPrint('選択モード ListView.builder: itemBuilder called for index $index');
+                        final note = notes[index];
+                        final isLast = index == notes.length - 1;
+                        final isSelected = _selectedNoteIds.contains(note.id);
+                        
+                        return Column(
+                          children: [
+                            NoteCard(
+                              note: note,
+                              isSelectionMode: _isSelectionMode,
+                              isSelected: isSelected,
+                              onTap: () => _toggleNoteSelection(note.id),
+                            ),
+                            if (isLast) const SizedBox(height: 8),
+                          ],
+                        );
+                      },
+                    )
+                  : ReorderableListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: notes.length,
+                      onReorder: (oldIndex, newIndex) => _reorderNotes(context, notes, oldIndex, newIndex),
+                      itemBuilder: (context, index) {
+                        final note = notes[index];
+                        final isLast = index == notes.length - 1;
+                        final isSelected = _selectedNoteIds.contains(note.id);
+                        
+                        return Container(
+                          key: ValueKey(note.id),
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              NoteCard(
+                                note: note,
+                                isSelectionMode: _isSelectionMode,
+                                isSelected: isSelected,
+                                onTap: () => _navigateToDetail(context, note),
+                              ),
+                              if (!isLast) 
+                                _buildDividerWithInsertButton(context, note.order),
+                              if (isLast) const SizedBox(height: 8),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
         );
+        
+        // 選択モード時のFloatingActionButtonを重ねて表示
+        if (_isSelectionMode && _selectedNoteIds.length >= 2) {
+          return Stack(
+            children: [
+              mainContent,
+              Positioned(
+                bottom: 16,
+                right: 16,
+                child: FloatingActionButton.extended(
+                  onPressed: () => _navigateToMergingScreen(notes),
+                  icon: const Icon(Icons.library_add),
+                  label: Text(
+                    '${_selectedNoteIds.length}件をまとめる',
+                    style: const TextStyle(fontFamily: 'NotoSansJP'),
+                  ),
+                ),
+              ),
+            ],
+          );
+        }
+        
+        return mainContent;
       },
     );
   }

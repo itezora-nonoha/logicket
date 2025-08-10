@@ -18,9 +18,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final GlobalKey<TimelineViewState> _timelineKey = GlobalKey<TimelineViewState>();
 
-  final List<Widget> _pages = [
-    const TimelineView(),
+  List<Widget> get _pages => [
+    TimelineView(key: _timelineKey),
     const _SearchPage(),
     const SettingsScreen(),
   ];
@@ -52,6 +53,15 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Logicket'),
         elevation: 1,
         actions: [
+          if (_selectedIndex == 0) // タイムライン画面でのみ表示
+            IconButton(
+              icon: const Icon(Icons.library_add),
+              onPressed: () {
+                // TimelineViewに選択モードを切り替える指示を送る
+                _toggleTimelineSelectionMode();
+              },
+              tooltip: 'ノートをまとめる',
+            ),
           Consumer<AuthService>(
             builder: (context, authService, child) {
               final user = authService.currentUser;
@@ -201,6 +211,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: const Text('Logicket'),
                 automaticallyImplyLeading: false,
                 actions: [
+                  if (_selectedIndex == 0) // タイムライン画面でのみ表示
+                    IconButton(
+                      icon: const Icon(Icons.library_add),
+                      onPressed: () {
+                        // TimelineViewに選択モードを切り替える指示を送る
+                        _toggleTimelineSelectionMode();
+                      },
+                      tooltip: 'ノートをまとめる',
+                    ),
                   Consumer<AuthService>(
                     builder: (context, authService, child) {
                       final user = authService.currentUser;
@@ -311,6 +330,11 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context) => NoteEditorScreen(insertAfterOrder: insertAfterOrder),
       ),
     );
+  }
+
+
+  void _toggleTimelineSelectionMode() {
+    _timelineKey.currentState?.toggleSelectionMode();
   }
 
   String _getInitials(String name) {

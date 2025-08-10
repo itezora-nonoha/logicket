@@ -7,11 +7,15 @@ import '../widgets/responsive_layout.dart';
 class NoteCard extends StatelessWidget {
   final Note note;
   final VoidCallback? onTap;
+  final bool isSelectionMode;
+  final bool isSelected;
 
   const NoteCard({
     super.key,
     required this.note,
     this.onTap,
+    this.isSelectionMode = false,
+    this.isSelected = false,
   });
 
   @override
@@ -24,30 +28,48 @@ class NoteCard extends StatelessWidget {
 
   Widget _buildMobileCard(BuildContext context) {
     return Card(
+      elevation: isSelected ? 2 : 1,
+      color: isSelected ? Theme.of(context).primaryColor.withOpacity(0.05) : null,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Row(
             children: [
-              // タイトルがある場合は表示
-              if (note.title != null && note.title!.trim().isNotEmpty) ...[
-                Text(
-                  note.title!,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'NotoSansJP',
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+              // 選択モード時のチェックボックス
+              if (isSelectionMode) ...[
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (_) => onTap?.call(),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(width: 8),
               ],
-              _buildContent(context),
-              const SizedBox(height: 12),
-              _buildFooter(context),
+              
+              // メインコンテンツ
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // タイトルがある場合は表示
+                    if (note.title != null && note.title!.trim().isNotEmpty) ...[
+                      Text(
+                        note.title!,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'NotoSansJP',
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                    _buildContent(context),
+                    const SizedBox(height: 12),
+                    _buildFooter(context),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -59,30 +81,48 @@ class NoteCard extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 600),
       child: Card(
+        elevation: isSelected ? 2 : 1,
+        color: isSelected ? Theme.of(context).primaryColor.withOpacity(0.05) : null,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                // タイトルがある場合は表示
-                if (note.title != null && note.title!.trim().isNotEmpty) ...[
-                  Text(
-                    note.title!,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'NotoSansJP',
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                // 選択モード時のチェックボックス
+                if (isSelectionMode) ...[
+                  Checkbox(
+                    value: isSelected,
+                    onChanged: (_) => onTap?.call(),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(width: 12),
                 ],
-                _buildContent(context),
-                const SizedBox(height: 16),
-                _buildFooter(context),
+                
+                // メインコンテンツ
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // タイトルがある場合は表示
+                      if (note.title != null && note.title!.trim().isNotEmpty) ...[
+                        Text(
+                          note.title!,
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'NotoSansJP',
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+                      _buildContent(context),
+                      const SizedBox(height: 16),
+                      _buildFooter(context),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
@@ -92,10 +132,15 @@ class NoteCard extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
+    // 選択モード時はより多くの内容を表示
+    final displayContent = isSelectionMode 
+        ? (note.content.length > 300 ? '${note.content.substring(0, 300)}...' : note.content)
+        : _safeSubstring(note.content, 0, 150);
+    
     return Column(
       children: [
         MarkdownBody(
-          data: _convertInternalLinks(note.content),
+          data: _convertInternalLinks(displayContent),
           styleSheet: MarkdownStyleSheet(
             p: const TextStyle(
               fontSize: 14, 
