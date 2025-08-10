@@ -19,10 +19,13 @@ class NoteEditorScreen extends StatefulWidget {
 }
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
+  static const int _maxContentLength = 200;
+  
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   DateTime? _inspirationDate;
   bool _isLoading = false;
+  int _currentContentLength = 0;
 
   @override
   void initState() {
@@ -33,6 +36,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     
     // 初期テキストを保存
     _previousText = _contentController.text;
+    _currentContentLength = _contentController.text.length;
     
     // テキスト変更リスナーを追加
     _contentController.addListener(_onTextChanged);
@@ -52,6 +56,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     final currentText = _contentController.text;
     final selection = _contentController.selection;
     
+    // 文字数を更新
+    setState(() {
+      _currentContentLength = currentText.length;
+    });
+    
     // テキストが変更され、改行が追加されたかチェック
     if (currentText.length > _previousText.length && 
         currentText.endsWith('\n') && 
@@ -68,12 +77,17 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       // 前の行が箇条書き形式（"- "で始まる）かチェック
       if (previousLine.startsWith('- ')) {
         // 箇条書きマーカーを自動挿入
-        final newText = '${currentText}- ';
+        final newText = '$currentText- ';
         
         _contentController.text = newText;
         _contentController.selection = TextSelection.collapsed(
           offset: newText.length,
         );
+        
+        // 箇条書きマーカー追加後に文字数を再更新
+        setState(() {
+          _currentContentLength = newText.length;
+        });
       }
     }
     
@@ -215,14 +229,35 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: '本文',
                   // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
                   hintText: 'マークダウン記法が使用できます',
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: EdgeInsets.all(16),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: _currentContentLength > _maxContentLength 
+                          ? Colors.red 
+                          : Colors.grey,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: _currentContentLength > _maxContentLength 
+                          ? Colors.red 
+                          : Colors.grey,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: _currentContentLength > _maxContentLength 
+                          ? Colors.red 
+                          : Theme.of(context).primaryColor,
+                      width: 2.0,
+                    ),
+                  ),
+                  labelStyle: const TextStyle(fontFamily: 'NotoSansJP'),
+                  hintStyle: const TextStyle(fontFamily: 'NotoSansJP'),
+                  contentPadding: const EdgeInsets.all(16),
                   alignLabelWithHint: true,
                 ),
                 // strutStyle: const StrutStyle(
@@ -237,6 +272,27 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 ),
               ),
             ),
+            
+            // 文字数表示
+            Padding(
+              padding: const EdgeInsets.only(top: 4, right: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    '$_currentContentLength / $_maxContentLength',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _currentContentLength > _maxContentLength 
+                          ? Colors.red 
+                          : Colors.grey[600],
+                      fontFamily: 'NotoSansJP',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
