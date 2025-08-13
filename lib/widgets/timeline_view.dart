@@ -355,4 +355,10 @@ class TimelineViewState extends State<TimelineView> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 }
