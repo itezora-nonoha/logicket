@@ -55,21 +55,30 @@ class NoteService extends ChangeNotifier {
 
   // 指定されたノートを参照している（内部リンクが貼られている）ノートを取得
   List<Note> getBacklinks(String noteId) {
+    debugPrint('getBacklinks called for noteId: $noteId');
+    
     // まず対象ノートのlinkHashを取得
     final targetNote = _notes.firstWhere(
       (note) => note.id == noteId && !note.isDeleted,
       orElse: () => throw ArgumentError('Note not found: $noteId'),
     );
     final targetLinkHash = targetNote.linkHash;
+    debugPrint('Target linkHash: $targetLinkHash');
     
-    // 全ノートの中から対象のlinkHashを含むノートを検索
-    return _notes
-        .where((note) => 
-            !note.isDeleted && 
-            !note.isArchived && 
-            note.id != noteId && // 自分自身は除外
-            note.content.contains('[[${targetLinkHash}]]'))
-        .toList();
+    // 全ノートを検索してデバッグ情報を出力
+    final allNotes = _notes.where((note) => !note.isDeleted && !note.isArchived && note.id != noteId);
+    debugPrint('Searching in ${allNotes.length} notes for pattern: [[${targetLinkHash}]]');
+    
+    final backlinks = <Note>[];
+    for (final note in allNotes) {
+      if (note.content.contains('[[${targetLinkHash}]]')) {
+        debugPrint('Found backlink: ${note.id} - ${note.displayTitle}');
+        backlinks.add(note);
+      }
+    }
+    
+    debugPrint('Found ${backlinks.length} backlinks');
+    return backlinks;
   }
 
   // IDでノートを取得

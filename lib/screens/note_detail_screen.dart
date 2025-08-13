@@ -90,6 +90,64 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               ),
             ],
           ),
+          bottomNavigationBar: Consumer<NoteService>(
+            builder: (context, noteService, child) {
+              final backlinks = noteService.getBacklinks(_currentNote.id);
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  border: Border(
+                    top: BorderSide(
+                      color: Colors.grey[300]!,
+                      width: 1,
+                    ),
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.link,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'バックリンク: ${backlinks.length}件',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                            fontFamily: 'NotoSansJP',
+                          ),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.tag,
+                          size: 16,
+                          color: Colors.grey[600],
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          _currentNote.linkHash,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[500],
+                            fontFamily: 'Consolas, monospace',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
           body: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -211,8 +269,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 Builder(
                   builder: (context) {
                     final backlinks = noteService.getBacklinks(_currentNote.id);
+                    debugPrint('Backlinks for note ${_currentNote.id} (${_currentNote.linkHash}): ${backlinks.length}件');
                     
                     if (backlinks.isEmpty) {
+                      debugPrint('No backlinks found for note ${_currentNote.id}');
                       return const SizedBox.shrink();
                     }
                     
