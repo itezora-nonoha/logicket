@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:provider/provider.dart';
 import '../models/note.dart';
+import '../services/note_service.dart';
 import '../widgets/responsive_layout.dart';
 
 class NoteCard extends StatelessWidget {
@@ -189,73 +191,79 @@ class NoteCard extends StatelessWidget {
   Widget _buildFooter(BuildContext context) {
     return SizedBox(
       height: 20, // フッターの高さを統一
-      child: Row(
-        children: [
-          Icon(
-            Icons.schedule,
-            size: 14,
-            color: Colors.grey[600],
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: Text(
-              _formatDate(note.updatedAt),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontFamily: 'NotoSansJP',
-              ),
-            ),
-          ),
-          // リンク数
-          if (note.linkedNotes.isNotEmpty) ...[
-            Icon(
-              Icons.link,
-              size: 14,
-              color: Colors.grey[600],
-            ),
-            const SizedBox(width: 4),
-            Text(
-              '${note.linkedNotes.length}',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontFamily: 'NotoSansJP',
-              ),
-            ),
-            const SizedBox(width: 12),
-          ],
-          // コピーボタン
-          InkWell(
-            onTap: () => _copyNoteContent(context),
-            borderRadius: BorderRadius.circular(4),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              child: Icon(
-                Icons.content_copy,
-                size: 16,
+      child: Consumer<NoteService>(
+        builder: (context, noteService, child) {
+          final backlinkCount = noteService.getBacklinks(note.id).length;
+          
+          return Row(
+            children: [
+              Icon(
+                Icons.schedule,
+                size: 14,
                 color: Colors.grey[600],
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          // ノートID（linkHash表示）
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Text(
-              'LinkID: ${note.linkHash}',
-              style: TextStyle(
-                fontSize: 10,
-                color: Colors.grey[500],
-                fontFamily: 'Consolas, Monaco, Courier, monospace',
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  _formatDate(note.updatedAt),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontFamily: 'NotoSansJP',
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+              // バックリンク数
+              if (backlinkCount > 0) ...[
+                Icon(
+                  Icons.link,
+                  size: 14,
+                  color: Colors.grey[600],
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$backlinkCount',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontFamily: 'NotoSansJP',
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              // コピーボタン
+              InkWell(
+                onTap: () => _copyNoteContent(context),
+                borderRadius: BorderRadius.circular(4),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Icon(
+                    Icons.content_copy,
+                    size: 16,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              // ノートID（linkHash表示）
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  'LinkID: ${note.linkHash}',
+                  style: TextStyle(
+                    fontSize: 10,
+                    color: Colors.grey[500],
+                    fontFamily: 'Consolas, Monaco, Courier, monospace',
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
