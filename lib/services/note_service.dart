@@ -358,18 +358,6 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  List<Note> getBacklinks(String noteId) {
-    return _notes
-        .where((note) => !note.isDeleted && !note.isArchived && note.linkedNotes.contains(noteId))
-        .toList();
-  }
-
-  List<Note> getBacklinksByLinkHash(String linkHash) {
-    return _notes
-        .where((note) => !note.isDeleted && !note.isArchived && note.linkedNotes.contains(linkHash))
-        .toList();
-  }
-
   List<String> _extractLinkedNotes(String content) {
     final regex = RegExp(r'\[\[([^\]]+)\]\]');
     final matches = regex.allMatches(content);

@@ -21,10 +21,27 @@ class TimelineViewState extends State<TimelineView> {
   final Set<String> _selectedNoteIds = {};
 
   void toggleSelectionMode() {
+    // 現在のスクロール位置を記録
+    double currentScrollOffset = 0.0;
+    if (_scrollController.hasClients) {
+      currentScrollOffset = _scrollController.offset;
+    }
+    
     setState(() {
       _isSelectionMode = !_isSelectionMode;
       if (!_isSelectionMode) {
         _selectedNoteIds.clear();
+      }
+    });
+    
+    // スクロール位置を復元（少し遅延させてレイアウトが確定してから実行）
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients && currentScrollOffset > 0) {
+        _scrollController.animateTo(
+          currentScrollOffset,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.easeInOut,
+        );
       }
     });
   }
