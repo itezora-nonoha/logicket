@@ -243,14 +243,17 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
             Expanded(
               child: TextField(
                 controller: _contentController,
-                expands: false,
-                maxLines: 15,        // 固定の最大行数
-                minLines: 8,         // 固定の最小行数
+                maxLines: null,
+                expands: true,
                 autocorrect: false,
                 enableSuggestions: false,
                 keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
+                scrollPhysics: const ClampingScrollPhysics(),
+                textAlign: TextAlign.start,
+                textAlignVertical: TextAlignVertical.top,
+                cursorWidth: 1.0,
                 decoration: InputDecoration(
                   labelText: '本文',
                   hintText: '選択したノートの内容を編集・まとめ直してください',
@@ -281,8 +284,15 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                   contentPadding: const EdgeInsets.all(16),
                   alignLabelWithHint: true,
                 ),
+                strutStyle: const StrutStyle(
+                  fontFamily: 'NotoSansJP',
+                  fontSize: 16,
+                  height: 1.4,
+                  forceStrutHeight: true,
+                ),
                 style: const TextStyle(
                   fontSize: 16,
+                  height: 1.4,
                   fontFamily: 'NotoSansJP',
                 ),
               ),

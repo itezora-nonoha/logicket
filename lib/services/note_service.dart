@@ -52,7 +52,38 @@ class NoteService extends ChangeNotifier {
   }
 
   bool get isLoading => _isLoading;
+  bool get isBackgroundSyncing => _isBackgroundSyncing;
+  DateTime? get lastSyncTime => _lastSyncTime;
 
+  // 指定されたノートを参照している（内部リンクが貼られている）ノートを取得
+  List<Note> getBacklinks(String noteId) {
+    // まず対象ノートのlinkHashを取得
+    final targetNote = _notes.firstWhere(
+      (note) => note.id == noteId && !note.isDeleted,
+      orElse: () => throw ArgumentError('Note not found: $noteId'),
+    );
+    final targetLinkHash = targetNote.linkHash;
+    
+    // 全ノートの中から対象のlinkHashを含むノートを検索
+    return _notes
+        .where((note) => 
+            !note.isDeleted && 
+            !note.isArchived && 
+            note.id != noteId && // 自分自身は除外
+            note.content.contains('[[${targetLinkHash}]]'))
+        .toList();
+  }
+
+  // IDでノートを取得
+  Note? getNoteById(String id) {
+    try {
+      return _notes.firstWhere((note) => note.id == id && !note.isDeleted);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /// ローカルキャッシュからノートを読み込み、その後バックグラウンドで最新データを同期
   Future<void> loadNotes(String userId) async {
     if (userId.isEmpty) return;
     

@@ -219,19 +219,20 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             Expanded(
               child: TextField(
                 controller: _contentController,
-                // maxLines: null,
-                // expands: true,
-                expands: false,
-                maxLines: 15,        // 固定の最大行数
-                minLines: 8,         // 固定の最小行数
+                maxLines: null,
+                expands: true,
                 autocorrect: false,
                 enableSuggestions: false,
                 keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
                 textCapitalization: TextCapitalization.none,
+                scrollPhysics: const ClampingScrollPhysics(),
+                // カーソル位置のずれを防ぐためのWebブラウザ対応
+                textAlign: TextAlign.start,
+                textAlignVertical: TextAlignVertical.top,
+                cursorWidth: 1.0,
                 decoration: InputDecoration(
                   labelText: '本文',
-                  // hintText: 'マークダウンでノートを書いてください...\n\n[[ノートID]] でリンクを作成できます',
                   hintText: 'マークダウン記法が使用できます',
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -260,14 +261,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   contentPadding: const EdgeInsets.all(16),
                   alignLabelWithHint: true,
                 ),
-                // strutStyle: const StrutStyle(
-                //   fontFamily: 'NotoSansJP',
-                //   height: 1.0,           // 行高を厳密に制御
-                //   forceStrutHeight: true, // 強制的に統一
-                // ),
+                strutStyle: const StrutStyle(
+                  fontFamily: 'NotoSansJP',
+                  fontSize: 16,
+                  height: 1.4,
+                  forceStrutHeight: true,
+                ),
                 style: const TextStyle(
                   fontSize: 16,
-                  // height: 1.5,
+                  height: 1.4,
                   fontFamily: 'NotoSansJP',
                 ),
               ),
