@@ -133,14 +133,14 @@ class NoteCard extends StatelessWidget {
 
   Widget _buildContent(BuildContext context) {
     // 選択モード時はより多くの内容を表示
-    final displayContent = isSelectionMode 
-        ? (note.content.length > 300 ? '${note.content.substring(0, 300)}...' : note.content)
-        : _safeSubstring(note.content, 0, 150);
+    // final displayContent = isSelectionMode 
+    //     ? (note.content.length > 300 ? '${note.content.substring(0, 300)}...' : note.content)
+    //     : _safeSubstring(note.content, 0, 150);
     
     return Column(
       children: [
         MarkdownBody(
-          data: _convertInternalLinks(displayContent),
+          data: _convertInternalLinks(note.content),
           styleSheet: MarkdownStyleSheet(
             p: const TextStyle(
               fontSize: 14, 
