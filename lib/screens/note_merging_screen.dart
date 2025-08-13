@@ -396,7 +396,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
   Future<void> _processOriginalNotes(NoteService noteService, String userId, Note newNote) async {
     for (final originalNote in widget.selectedNotes) {
       // 元ノートの本文末尾にリンクを挿入
-      final linkText = '\n\n→ まとめ直したノート: [[${newNote.linkHash}]]';
+      final linkText = '\n\n～ [[${newNote.linkHash}]] としてまとめ済み ～';
       final updatedContent = originalNote.content + linkText;
       
       // 元ノートを更新（リンク挿入）
