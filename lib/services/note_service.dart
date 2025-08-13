@@ -66,7 +66,8 @@ class NoteService extends ChangeNotifier {
     debugPrint('Target linkHash: $targetLinkHash');
     
     // 全ノートを検索してデバッグ情報を出力
-    final allNotes = _notes.where((note) => !note.isDeleted && !note.isArchived && note.id != noteId);
+    // final allNotes = _notes.where((note) => !note.isDeleted && !note.isArchived && note.id != noteId);
+    final allNotes = _notes.where((note) => !note.isDeleted && note.id != noteId);
     debugPrint('Searching in ${allNotes.length} notes for pattern: [[${targetLinkHash}]]');
     
     final backlinks = <Note>[];
