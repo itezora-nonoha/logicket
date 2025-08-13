@@ -19,6 +19,7 @@ class TimelineView extends StatefulWidget {
 class TimelineViewState extends State<TimelineView> {
   bool _isSelectionMode = false;
   final Set<String> _selectedNoteIds = {};
+  final ScrollController _scrollController = ScrollController();
 
   void toggleSelectionMode() {
     // 現在のスクロール位置を記録

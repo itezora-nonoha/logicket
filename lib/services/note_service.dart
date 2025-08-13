@@ -52,8 +52,6 @@ class NoteService extends ChangeNotifier {
   }
 
   bool get isLoading => _isLoading;
-  bool get isBackgroundSyncing => _isBackgroundSyncing;
-  DateTime? get lastSyncTime => _lastSyncTime;
 
   // 指定されたノートを参照している（内部リンクが貼られている）ノートを取得
   List<Note> getBacklinks(String noteId) {
@@ -296,9 +294,6 @@ class NoteService extends ChangeNotifier {
     }
   }
 
-  Note? getNoteById(String id) {
-    return _notes.where((note) => note.id == id && !note.isDeleted).firstOrNull;
-  }
 
   Note? getNoteByLinkHash(String linkHash) {
     return _notes.where((note) => note.linkHash == linkHash && !note.isDeleted).firstOrNull;
