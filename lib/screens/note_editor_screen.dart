@@ -218,21 +218,25 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
             // 本文入力欄
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: _currentContentLength > _maxContentLength
-                        ? Colors.red
-                        : (_contentFocusNode.hasFocus
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey),
-                    width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
+              child: GestureDetector(
+                onTap: () {
+                  _contentFocusNode.requestFocus();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: _currentContentLength > _maxContentLength
+                          ? Colors.red
+                          : (_contentFocusNode.hasFocus
+                              ? Theme.of(context).primaryColor
+                              : Colors.grey),
+                      width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
                   ),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                     // ラベル
                     Container(
                       padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
@@ -273,11 +277,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                               controller: _contentController,
                               focusNode: _contentFocusNode,
                               style: const TextStyle(
+                                fontFamily: 'NotoSansJP',
                                 fontSize: 16,
                                 height: 1.4,
                                 color: Colors.black87,
                               ),
                               strutStyle: const StrutStyle(
+                                fontFamily: 'NotoSansJP',
                                 fontSize: 16,
                                 height: 1.4,
                                 forceStrutHeight: true,
@@ -299,7 +305,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                         ),
                       ),
                     ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
