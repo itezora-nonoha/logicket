@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/note_service.dart';
 import '../services/auth_service.dart';
+import '../services/settings_service.dart';
 import '../models/note.dart';
 
 class NoteEditorScreen extends StatefulWidget {
@@ -218,96 +219,12 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
             // 本文入力欄
             Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  _contentFocusNode.requestFocus();
+              child: Consumer<SettingsService>(
+                builder: (context, settingsService, child) {
+                  return settingsService.useEditableText
+                      ? _buildEditableTextInput(context)
+                      : _buildTextFieldInput(context);
                 },
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: _currentContentLength > _maxContentLength
-                          ? Colors.red
-                          : (_contentFocusNode.hasFocus
-                              ? Theme.of(context).primaryColor
-                              : Colors.grey),
-                      width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                    // ラベル
-                    Container(
-                      padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
-                      child: Text(
-                        '本文',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: _currentContentLength > _maxContentLength
-                              ? Colors.red
-                              : (_contentFocusNode.hasFocus
-                                  ? Theme.of(context).primaryColor
-                                  : Colors.grey[600]),
-                        ),
-                      ),
-                    ),
-                    // EditableTextウィジェット
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                        child: Stack(
-                          children: [
-                            // ヒントテキスト
-                            if (_contentController.text.isEmpty && !_contentFocusNode.hasFocus)
-                              Positioned(
-                                top: 0,
-                                left: 0,
-                                child: Text(
-                                  'マークダウン記法が使用できます',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    height: 1.4,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ),
-                            // EditableText本体
-                            EditableText(
-                              controller: _contentController,
-                              focusNode: _contentFocusNode,
-                              style: const TextStyle(
-                                fontFamily: 'NotoSansJP',
-                                fontSize: 16,
-                                height: 1.4,
-                                color: Colors.black87,
-                              ),
-                              strutStyle: const StrutStyle(
-                                fontFamily: 'NotoSansJP',
-                                fontSize: 16,
-                                height: 1.4,
-                                forceStrutHeight: true,
-                              ),
-                              cursorColor: Theme.of(context).primaryColor,
-                              cursorWidth: 1.0,
-                              backgroundCursorColor: Colors.grey,
-                              maxLines: null,
-                              expands: true,
-                              textAlign: TextAlign.start,
-                              autocorrect: false,
-                              enableSuggestions: false,
-                              keyboardType: TextInputType.multiline,
-                              textInputAction: TextInputAction.newline,
-                              textCapitalization: TextCapitalization.sentences,
-                              selectionControls: MaterialTextSelectionControls(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    ],
-                  ),
-                ),
               ),
             ),
 
@@ -435,6 +352,151 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         _inspirationDate = picked;
       });
     }
+  }
+
+  Widget _buildEditableTextInput(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _contentFocusNode.requestFocus();
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: _currentContentLength > _maxContentLength
+                ? Colors.red
+                : (_contentFocusNode.hasFocus
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey),
+            width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ラベル
+            Container(
+              padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
+              child: Text(
+                '本文',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: _currentContentLength > _maxContentLength
+                      ? Colors.red
+                      : (_contentFocusNode.hasFocus
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[600]),
+                ),
+              ),
+            ),
+            // EditableTextウィジェット
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Stack(
+                  children: [
+                    // ヒントテキスト
+                    if (_contentController.text.isEmpty && !_contentFocusNode.hasFocus)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: Text(
+                          'マークダウン記法が使用できます',
+                          style: TextStyle(
+                            fontSize: 16,
+                            height: 1.4,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ),
+                    // EditableText本体
+                    EditableText(
+                      controller: _contentController,
+                      focusNode: _contentFocusNode,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        height: 1.4,
+                        color: Colors.black87,
+                      ),
+                      strutStyle: const StrutStyle(
+                        fontSize: 16,
+                        height: 1.4,
+                        forceStrutHeight: true,
+                      ),
+                      cursorColor: Theme.of(context).primaryColor,
+                      cursorWidth: 1.0,
+                      backgroundCursorColor: Colors.grey,
+                      maxLines: null,
+                      expands: true,
+                      textAlign: TextAlign.start,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      keyboardType: TextInputType.multiline,
+                      textInputAction: TextInputAction.newline,
+                      textCapitalization: TextCapitalization.sentences,
+                      selectionControls: MaterialTextSelectionControls(),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextFieldInput(BuildContext context) {
+    return TextField(
+      controller: _contentController,
+      maxLines: null,
+      expands: true,
+      autocorrect: false,
+      enableSuggestions: false,
+      keyboardType: TextInputType.multiline,
+      textInputAction: TextInputAction.newline,
+      textCapitalization: TextCapitalization.sentences,
+      textAlign: TextAlign.start,
+      textAlignVertical: TextAlignVertical.top,
+      cursorWidth: 1.0,
+      decoration: InputDecoration(
+        labelText: '本文',
+        hintText: 'マークダウン記法が使用できます',
+        border: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: _currentContentLength > _maxContentLength
+                ? Colors.red
+                : Colors.grey,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: _currentContentLength > _maxContentLength
+                ? Colors.red
+                : Colors.grey,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: _currentContentLength > _maxContentLength
+                ? Colors.red
+                : Theme.of(context).primaryColor,
+            width: 2.0,
+          ),
+        ),
+        contentPadding: const EdgeInsets.all(16),
+        alignLabelWithHint: true,
+      ),
+      strutStyle: const StrutStyle(
+        fontSize: 16,
+        height: 1.4,
+        forceStrutHeight: true,
+      ),
+      style: const TextStyle(
+        fontSize: 16,
+        height: 1.4,
+      ),
+    );
   }
 
   String _formatDate(DateTime date) {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import '../services/settings_service.dart';
 import 'auth/login_screen.dart';
 import 'user_profile_screen.dart';
 
@@ -57,6 +58,22 @@ class SettingsScreen extends StatelessWidget {
               Card(
                 child: Column(
                   children: [
+                    Consumer<SettingsService>(
+                      builder: (context, settingsService, child) {
+                        return ListTile(
+                          leading: const Icon(Icons.edit),
+                          title: const Text('ノート編集方式'),
+                          subtitle: Text(
+                            settingsService.useEditableText 
+                                ? 'EditableText（実験的）' 
+                                : 'TextField（標準）'
+                          ),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => _showEditorModeDialog(context),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1),
                     ListTile(
                       leading: const Icon(Icons.notifications),
                       title: const Text('通知設定'),
@@ -221,6 +238,88 @@ class SettingsScreen extends StatelessWidget {
           fontWeight: FontWeight.bold,
           color: Theme.of(context).primaryColor,
         ),
+      ),
+    );
+  }
+
+  void _showEditorModeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Consumer<SettingsService>(
+        builder: (context, settingsService, child) {
+          return AlertDialog(
+            title: const Text('ノート編集方式の選択'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'ノート編集画面で使用するテキスト入力方式を選択してください。',
+                  style: TextStyle(fontSize: 14),
+                ),
+                const SizedBox(height: 16),
+                
+                RadioListTile<bool>(
+                  title: const Text('TextField（標準）'),
+                  subtitle: const Text('従来のテキスト入力方式'),
+                  value: false,
+                  groupValue: settingsService.useEditableText,
+                  onChanged: (value) {
+                    if (value != null) {
+                      settingsService.setUseEditableText(value);
+                    }
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
+                
+                RadioListTile<bool>(
+                  title: const Text('EditableText（実験的）'),
+                  subtitle: const Text('カーソル位置ずれの改善版'),
+                  value: true,
+                  groupValue: settingsService.useEditableText,
+                  onChanged: (value) {
+                    if (value != null) {
+                      settingsService.setUseEditableText(value);
+                    }
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
+                
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[50],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info_outline, 
+                           color: Colors.blue[700], 
+                           size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'IME（日本語入力）でカーソル位置がずれる問題が発生する場合は、EditableTextをお試しください。',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[700],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('閉じる'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

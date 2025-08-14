@@ -87,6 +87,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                       break;
+                    case 'settings':
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsScreen(),
+                        ),
+                      );
+                      break;
                     case 'logout':
                       final result = await showDialog<bool>(
                         context: context,
@@ -136,6 +143,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                   ),
+                  const PopupMenuItem(
+                    value: 'settings',
+                    child: Row(
+                      children: [
+                        Icon(Icons.settings),
+                        SizedBox(width: 12),
+                        Text('設定'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuDivider(),
                   const PopupMenuItem(
                     value: 'logout',
                     child: Row(
