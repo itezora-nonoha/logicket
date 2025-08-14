@@ -19,6 +19,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   late TextEditingController _titleController;
   late TextEditingController _contentController;
+  late FocusNode _contentFocusNode;
   DateTime? _inspirationDate;
   bool _isLoading = false;
   int _currentContentLength = 0;
@@ -30,6 +31,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentController = TextEditingController(
       text: widget.note?.content ?? '',
     );
+    _contentFocusNode = FocusNode();
     _inspirationDate = widget.note?.inspirationDate;
 
     // 初期テキストを保存
@@ -38,6 +40,13 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     // テキスト変更リスナーを追加
     _contentController.addListener(_onTextChanged);
+    
+    // フォーカス変更リスナーを追加
+    _contentFocusNode.addListener(() {
+      setState(() {
+        // フォーカス状態の変更に応じてUI更新
+      });
+    });
   }
 
   @override
@@ -45,6 +54,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
     _contentController.removeListener(_onTextChanged);
     _titleController.dispose();
     _contentController.dispose();
+    _contentFocusNode.dispose();
     super.dispose();
   }
 
@@ -208,60 +218,88 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
             // 本文入力欄
             Expanded(
-              child: TextField(
-                controller: _contentController,
-                maxLines: null,
-                expands: true,
-                autocorrect: false,
-                enableSuggestions: false,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                textCapitalization: TextCapitalization.none,
-                scrollPhysics: const ClampingScrollPhysics(),
-                // カーソル位置のずれを防ぐためのWebブラウザ対応
-                textAlign: TextAlign.start,
-                textAlignVertical: TextAlignVertical.top,
-                cursorWidth: 1.0,
-                decoration: InputDecoration(
-                  labelText: '本文',
-                  hintText: 'マークダウン記法が使用できます',
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength
-                          ? Colors.red
-                          : Colors.grey,
-                    ),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: _currentContentLength > _maxContentLength
+                        ? Colors.red
+                        : (_contentFocusNode.hasFocus
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey),
+                    width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength
-                          ? Colors.red
-                          : Colors.grey,
-                    ),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength
-                          ? Colors.red
-                          : Theme.of(context).primaryColor,
-                      width: 2.0,
-                    ),
-                  ),
-                  labelStyle: const TextStyle(fontFamily: 'NotoSansJP'),
-                  hintStyle: const TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: const EdgeInsets.all(16),
-                  alignLabelWithHint: true,
+                  borderRadius: BorderRadius.circular(4),
                 ),
-                strutStyle: const StrutStyle(
-                  fontFamily: 'NotoSansJP',
-                  fontSize: 16,
-                  height: 1.4,
-                  forceStrutHeight: true,
-                ),
-                style: const TextStyle(
-                  fontSize: 16,
-                  height: 1.4,
-                  fontFamily: 'NotoSansJP',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // ラベル
+                    Container(
+                      padding: const EdgeInsets.only(left: 12, right: 12, top: 8),
+                      child: Text(
+                        '本文',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _currentContentLength > _maxContentLength
+                              ? Colors.red
+                              : (_contentFocusNode.hasFocus
+                                  ? Theme.of(context).primaryColor
+                                  : Colors.grey[600]),
+                        ),
+                      ),
+                    ),
+                    // EditableTextウィジェット
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Stack(
+                          children: [
+                            // ヒントテキスト
+                            if (_contentController.text.isEmpty && !_contentFocusNode.hasFocus)
+                              Positioned(
+                                top: 0,
+                                left: 0,
+                                child: Text(
+                                  'マークダウン記法が使用できます',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    height: 1.4,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ),
+                            // EditableText本体
+                            EditableText(
+                              controller: _contentController,
+                              focusNode: _contentFocusNode,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                height: 1.4,
+                                color: Colors.black87,
+                              ),
+                              strutStyle: const StrutStyle(
+                                fontSize: 16,
+                                height: 1.4,
+                                forceStrutHeight: true,
+                              ),
+                              cursorColor: Theme.of(context).primaryColor,
+                              cursorWidth: 1.0,
+                              backgroundCursorColor: Colors.grey,
+                              maxLines: null,
+                              expands: true,
+                              textAlign: TextAlign.start,
+                              autocorrect: false,
+                              enableSuggestions: false,
+                              keyboardType: TextInputType.multiline,
+                              textInputAction: TextInputAction.newline,
+                              textCapitalization: TextCapitalization.sentences,
+                              selectionControls: MaterialTextSelectionControls(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
