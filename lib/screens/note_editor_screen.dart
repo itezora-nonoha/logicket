@@ -8,11 +8,7 @@ class NoteEditorScreen extends StatefulWidget {
   final Note? note;
   final double? insertAfterOrder;
 
-  const NoteEditorScreen({
-    super.key,
-    this.note,
-    this.insertAfterOrder,
-  });
+  const NoteEditorScreen({super.key, this.note, this.insertAfterOrder});
 
   @override
   State<NoteEditorScreen> createState() => _NoteEditorScreenState();
@@ -20,7 +16,7 @@ class NoteEditorScreen extends StatefulWidget {
 
 class _NoteEditorScreenState extends State<NoteEditorScreen> {
   static const int _maxContentLength = 200;
-  
+
   late TextEditingController _titleController;
   late TextEditingController _contentController;
   DateTime? _inspirationDate;
@@ -31,13 +27,15 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.note?.title ?? '');
-    _contentController = TextEditingController(text: widget.note?.content ?? '');
+    _contentController = TextEditingController(
+      text: widget.note?.content ?? '',
+    );
     _inspirationDate = widget.note?.inspirationDate;
-    
+
     // 初期テキストを保存
     _previousText = _contentController.text;
     _currentContentLength = _contentController.text.length;
-    
+
     // テキスト変更リスナーを追加
     _contentController.addListener(_onTextChanged);
   }
@@ -54,43 +52,42 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
   void _onTextChanged() {
     final currentText = _contentController.text;
-    final selection = _contentController.selection;
-    
-    // 文字数を更新
+    final value = _contentController.value;
+    final selection = value.selection;
+
     setState(() {
       _currentContentLength = currentText.length;
     });
-    
-    // テキストが変更され、改行が追加されたかチェック
-    if (currentText.length > _previousText.length && 
-        currentText.endsWith('\n') && 
+
+    // IME日本語入力中は何もしない
+    if (value.composing.isValid) {
+      _previousText = currentText;
+      return;
+    }
+
+    if (currentText.length > _previousText.length &&
+        currentText.endsWith('\n') &&
         selection.isValid) {
-      
       final cursorPosition = selection.baseOffset;
-      
-      // 改行の直前の行を取得
       final beforeNewline = currentText.substring(0, cursorPosition - 1);
       final lastNewlineIndex = beforeNewline.lastIndexOf('\n');
-      final previousLineStart = lastNewlineIndex == -1 ? 0 : lastNewlineIndex + 1;
+      final previousLineStart = lastNewlineIndex == -1
+          ? 0
+          : lastNewlineIndex + 1;
       final previousLine = beforeNewline.substring(previousLineStart);
-      
-      // 前の行が箇条書き形式（"- "で始まる）かチェック
+
       if (previousLine.startsWith('- ')) {
-        // 箇条書きマーカーを自動挿入
         final newText = '$currentText- ';
-        
-        _contentController.text = newText;
-        _contentController.selection = TextSelection.collapsed(
-          offset: newText.length,
+        _contentController.value = TextEditingValue(
+          text: newText,
+          selection: TextSelection.collapsed(offset: newText.length),
         );
-        
-        // 箇条書きマーカー追加後に文字数を再更新
         setState(() {
           _currentContentLength = newText.length;
         });
       }
     }
-    
+
     _previousText = currentText;
   }
 
@@ -119,10 +116,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               onPressed: _saveNote,
               child: const Text(
                 '保存',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'NotoSansJP',
-                ),
+                style: TextStyle(color: Colors.white, fontFamily: 'NotoSansJP'),
               ),
             ),
         ],
@@ -162,7 +156,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   ],
                 ),
               ),
-            
+
             // タイトル入力欄
             TextField(
               controller: _titleController,
@@ -178,14 +172,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
                 contentPadding: EdgeInsets.all(16),
               ),
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'NotoSansJP',
-              ),
+              style: const TextStyle(fontSize: 16, fontFamily: 'NotoSansJP'),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 発想日入力欄
             InkWell(
               onTap: _selectInspirationDate,
@@ -205,16 +196,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'NotoSansJP',
-                    color: _inspirationDate != null 
-                        ? Colors.black87 
+                    color: _inspirationDate != null
+                        ? Colors.black87
                         : Colors.grey[600],
                   ),
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 本文入力欄
             Expanded(
               child: TextField(
@@ -236,22 +227,22 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   hintText: 'マークダウン記法が使用できます',
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength 
-                          ? Colors.red 
+                      color: _currentContentLength > _maxContentLength
+                          ? Colors.red
                           : Colors.grey,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength 
-                          ? Colors.red 
+                      color: _currentContentLength > _maxContentLength
+                          ? Colors.red
                           : Colors.grey,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: _currentContentLength > _maxContentLength 
-                          ? Colors.red 
+                      color: _currentContentLength > _maxContentLength
+                          ? Colors.red
                           : Theme.of(context).primaryColor,
                       width: 2.0,
                     ),
@@ -274,7 +265,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 ),
               ),
             ),
-            
+
             // 文字数表示
             Padding(
               padding: const EdgeInsets.only(top: 4, right: 16),
@@ -285,8 +276,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                     '$_currentContentLength / $_maxContentLength',
                     style: TextStyle(
                       fontSize: 12,
-                      color: _currentContentLength > _maxContentLength 
-                          ? Colors.red 
+                      color: _currentContentLength > _maxContentLength
+                          ? Colors.red
                           : Colors.grey[600],
                       fontFamily: 'NotoSansJP',
                     ),
@@ -294,7 +285,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -332,11 +323,11 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       final noteService = context.read<NoteService>();
       final authService = context.read<AuthService>();
       final userId = authService.userId!;
-      
-      final title = _titleController.text.trim().isEmpty 
-          ? null 
+
+      final title = _titleController.text.trim().isEmpty
+          ? null
           : _titleController.text.trim();
-      
+
       if (widget.note == null) {
         // 新規作成
         // 発想日が空の場合は作成日を設定
@@ -351,8 +342,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       } else {
         // 更新
         await noteService.updateNote(
-          userId, 
-          widget.note!.id, 
+          userId,
+          widget.note!.id,
           _contentController.text.trim(),
           title: title,
           inspirationDate: _inspirationDate,
@@ -393,7 +384,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
-    
+
     if (picked != null && picked != _inspirationDate) {
       setState(() {
         _inspirationDate = picked;
