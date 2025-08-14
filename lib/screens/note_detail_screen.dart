@@ -64,8 +64,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           'アーカイブ',
                           style: TextStyle(
                             color: Colors.orange[700],
-                            fontFamily: 'NotoSansJP',
-                          ),
+                                                      ),
                         ),
                       ],
                     ),
@@ -80,8 +79,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           '削除',
                           style: TextStyle(
                             color: Colors.red,
-                            fontFamily: 'NotoSansJP',
-                          ),
+                                                      ),
                         ),
                       ],
                     ),
@@ -120,8 +118,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
-                            fontFamily: 'NotoSansJP',
-                          ),
+                                                      ),
                         ),
                       ],
                     ),
@@ -166,8 +163,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             _currentNote.title!,
                             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -177,23 +173,19 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             p: const TextStyle(
                               fontSize: 16, 
                               height: 1.6,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                             h1: const TextStyle(
                               fontSize: 24, 
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                             h2: const TextStyle(
                               fontSize: 20, 
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                             h3: const TextStyle(
                               fontSize: 18, 
                               fontWeight: FontWeight.bold,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                             code: TextStyle(
                               backgroundColor: Colors.grey[100],
                               fontFamily: 'Consolas, Monaco, Courier, monospace',
@@ -206,8 +198,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                             blockquote: TextStyle(
                               color: Colors.grey[600],
                               fontStyle: FontStyle.italic,
-                              fontFamily: 'NotoSansJP',
-                            ),
+                                                          ),
                             blockquoteDecoration: BoxDecoration(
                               color: Colors.grey[50],
                             ),
@@ -241,8 +232,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                           'メタ情報',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            fontFamily: 'NotoSansJP',
-                          ),
+                                                      ),
                         ),
                         const SizedBox(height: 12),
                         if (_currentNote.inspirationDate != null) ...[
@@ -286,8 +276,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                               'バックリンク (${backlinks.length})',
                               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
-                                fontFamily: 'NotoSansJP',
-                              ),
+                                                              ),
                             ),
                             const SizedBox(height: 12),
                             ...backlinks.map((backlink) => _buildBacklinkItem(context, backlink)),
@@ -315,16 +304,14 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
           style: TextStyle(
             fontWeight: FontWeight.w500,
             color: Colors.grey[700],
-            fontFamily: 'NotoSansJP',
-          ),
+                      ),
         ),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
               color: Colors.grey[600],
-              fontFamily: 'NotoSansJP',
-            ),
+                          ),
           ),
         ),
       ],
@@ -353,8 +340,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'NotoSansJP',
-                ),
+                                  ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -364,8 +350,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               _getPreviewText(backlink.content),
               style: const TextStyle(
                 fontSize: 14,
-                fontFamily: 'NotoSansJP',
-              ),
+                              ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
@@ -375,8 +360,7 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
-                fontFamily: 'NotoSansJP',
-              ),
+                              ),
             ),
           ],
         ),

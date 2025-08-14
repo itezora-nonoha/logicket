@@ -54,26 +54,10 @@ class LogicketApp extends StatelessWidget {
             brightness: Brightness.light,
           ),
           useMaterial3: true,
-          fontFamily: 'NotoSansJP', // 日本語フォント指定
-          textTheme: const TextTheme(
-            bodyLarge: TextStyle(fontFamily: 'NotoSansJP'),
-            bodyMedium: TextStyle(fontFamily: 'NotoSansJP'),
-            bodySmall: TextStyle(fontFamily: 'NotoSansJP'),
-            headlineLarge: TextStyle(fontFamily: 'NotoSansJP'),
-            headlineMedium: TextStyle(fontFamily: 'NotoSansJP'),
-            headlineSmall: TextStyle(fontFamily: 'NotoSansJP'),
-            titleLarge: TextStyle(fontFamily: 'NotoSansJP'),
-            titleMedium: TextStyle(fontFamily: 'NotoSansJP'),
-            titleSmall: TextStyle(fontFamily: 'NotoSansJP'),
-            labelLarge: TextStyle(fontFamily: 'NotoSansJP'),
-            labelMedium: TextStyle(fontFamily: 'NotoSansJP'),
-            labelSmall: TextStyle(fontFamily: 'NotoSansJP'),
-          ),
           appBarTheme: const AppBarTheme(
             backgroundColor: Color(0xFF33A6B8),
             foregroundColor: Colors.white,
             titleTextStyle: TextStyle(
-              fontFamily: 'NotoSansJP',
               fontSize: 20,
               fontWeight: FontWeight.w500,
               color: Colors.white,
@@ -86,17 +70,13 @@ class LogicketApp extends StatelessWidget {
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
             selectedItemColor: Color(0xFF33A6B8),
             unselectedItemColor: Colors.grey,
-            selectedLabelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-            unselectedLabelStyle: TextStyle(fontFamily: 'NotoSansJP'),
           ),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
             ),
           ),
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(
-              textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
             ),
           ),
         ),

@@ -146,8 +146,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                 '保存',
                 style: TextStyle(
                   color: Colors.white,
-                  fontFamily: 'NotoSansJP',
-                ),
+                                  ),
               ),
             ),
         ],
@@ -180,8 +179,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                     style: TextStyle(
                       color: Theme.of(context).primaryColor,
                       fontSize: 14,
-                      fontFamily: 'NotoSansJP',
-                    ),
+                                          ),
                   ),
                 ],
               ),
@@ -204,8 +202,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
               ),
               style: const TextStyle(
                 fontSize: 16,
-                fontFamily: 'NotoSansJP',
-              ),
+                              ),
             ),
             
             const SizedBox(height: 16),
@@ -228,8 +225,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                       : '発想した日を選択...',
                   style: TextStyle(
                     fontSize: 16,
-                    fontFamily: 'NotoSansJP',
-                    color: _inspirationDate != null 
+                                        color: _inspirationDate != null 
                         ? Colors.black87 
                         : Colors.grey[600],
                   ),
@@ -285,16 +281,14 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                   alignLabelWithHint: true,
                 ),
                 strutStyle: const StrutStyle(
-                  fontFamily: 'NotoSansJP',
-                  fontSize: 16,
+                                    fontSize: 16,
                   height: 1.4,
                   forceStrutHeight: true,
                 ),
                 style: const TextStyle(
                   fontSize: 16,
                   height: 1.4,
-                  fontFamily: 'NotoSansJP',
-                ),
+                                  ),
               ),
             ),
             
@@ -311,8 +305,7 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                       color: _currentContentLength > _maxContentLength 
                           ? Colors.red 
                           : Colors.grey[600],
-                      fontFamily: 'NotoSansJP',
-                    ),
+                                          ),
                   ),
                 ],
               ),
