@@ -208,7 +208,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            if (widget.insertAfterOrder != null)
+            if (widget.insertAfterOrder != null && !_showDebugInfo)
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(12),
@@ -240,8 +240,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 ),
               ),
 
-            // タイトル入力欄
-            TextField(
+            // タイトル入力欄（デバッグモード時は非表示）
+            if (!_showDebugInfo)
+              TextField(
               controller: _titleController,
               autocorrect: false,
               enableSuggestions: false,
@@ -255,13 +256,14 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
                 contentPadding: EdgeInsets.all(16),
               ),
-              style: const TextStyle(fontSize: 16, fontFamily: 'NotoSansJP'),
-            ),
+              style: const TextStyle(fontSize: 16),
+              ),
 
-            const SizedBox(height: 16),
+            if (!_showDebugInfo) const SizedBox(height: 16),
 
-            // 発想日入力欄
-            InkWell(
+            // 発想日入力欄（デバッグモード時は非表示）
+            if (!_showDebugInfo)
+              InkWell(
               onTap: _selectInspirationDate,
               borderRadius: BorderRadius.circular(4),
               child: InputDecorator(
@@ -285,9 +287,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   ),
                 ),
               ),
-            ),
+              ),
 
-            const SizedBox(height: 16),
+            if (!_showDebugInfo) const SizedBox(height: 16),
 
             // 本文入力欄とデバッグ情報を並列表示
             Expanded(
