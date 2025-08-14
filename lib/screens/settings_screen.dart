@@ -259,30 +259,34 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 
-                RadioListTile<bool>(
-                  title: const Text('TextField（標準）'),
-                  subtitle: const Text('従来のテキスト入力方式'),
-                  value: false,
-                  groupValue: settingsService.useEditableText,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settingsService.setUseEditableText(value);
-                    }
-                  },
-                  contentPadding: EdgeInsets.zero,
+                Material(
+                  child: RadioListTile<bool>(
+                    title: const Text('TextField（標準）'),
+                    subtitle: const Text('従来のテキスト入力方式'),
+                    value: false,
+                    groupValue: settingsService.useEditableText,
+                    onChanged: (value) {
+                      if (value != null) {
+                        settingsService.setUseEditableText(value);
+                      }
+                    },
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
                 
-                RadioListTile<bool>(
-                  title: const Text('EditableText（実験的）'),
-                  subtitle: const Text('カーソル位置ずれの改善版'),
-                  value: true,
-                  groupValue: settingsService.useEditableText,
-                  onChanged: (value) {
-                    if (value != null) {
-                      settingsService.setUseEditableText(value);
-                    }
-                  },
-                  contentPadding: EdgeInsets.zero,
+                Material(
+                  child: RadioListTile<bool>(
+                    title: const Text('EditableText（実験的）'),
+                    subtitle: const Text('カーソル位置ずれの改善版'),
+                    value: true,
+                    groupValue: settingsService.useEditableText,
+                    onChanged: (value) {
+                      if (value != null) {
+                        settingsService.setUseEditableText(value);
+                      }
+                    },
+                    contentPadding: EdgeInsets.zero,
+                  ),
                 ),
                 
                 const SizedBox(height: 8),

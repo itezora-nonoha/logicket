@@ -393,50 +393,61 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: Stack(
-                  children: [
-                    // ヒントテキスト
-                    if (_contentController.text.isEmpty && !_contentFocusNode.hasFocus)
-                      Positioned(
-                        top: 0,
-                        left: 0,
-                        child: Text(
-                          'マークダウン記法が使用できます',
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: MediaQuery.of(context).size.height * 0.3,
+                    ),
+                    child: Stack(
+                      children: [
+                        // ヒントテキスト
+                        if (_contentController.text.isEmpty)
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            child: IgnorePointer(
+                              child: Text(
+                                'マークダウン記法が使用できます',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  height: 1.4,
+                                  color: Theme.of(context).hintColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        // EditableText本体
+                        EditableText(
+                          controller: _contentController,
+                          focusNode: _contentFocusNode,
                           style: TextStyle(
                             fontSize: 16,
                             height: 1.4,
-                            color: Colors.grey[600],
+                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
                           ),
+                          strutStyle: const StrutStyle(
+                            fontSize: 16,
+                            height: 1.4,
+                            forceStrutHeight: false,
+                          ),
+                          cursorColor: Theme.of(context).primaryColor,
+                          cursorWidth: 1.0,
+                          backgroundCursorColor: Colors.grey[300] ?? Colors.grey,
+                          maxLines: null,
+                          minLines: 8,
+                          textAlign: TextAlign.start,
+                          autocorrect: false,
+                          enableSuggestions: false,
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.newline,
+                          textCapitalization: TextCapitalization.sentences,
+                          selectionControls: MaterialTextSelectionControls(),
+                          showCursor: true,
+                          readOnly: false,
                         ),
-                      ),
-                    // EditableText本体
-                    EditableText(
-                      controller: _contentController,
-                      focusNode: _contentFocusNode,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        height: 1.4,
-                        color: Colors.black87,
-                      ),
-                      strutStyle: const StrutStyle(
-                        fontSize: 16,
-                        height: 1.4,
-                        forceStrutHeight: true,
-                      ),
-                      cursorColor: Theme.of(context).primaryColor,
-                      cursorWidth: 1.0,
-                      backgroundCursorColor: Colors.grey,
-                      maxLines: null,
-                      expands: true,
-                      textAlign: TextAlign.start,
-                      autocorrect: false,
-                      enableSuggestions: false,
-                      keyboardType: TextInputType.multiline,
-                      textInputAction: TextInputAction.newline,
-                      textCapitalization: TextCapitalization.sentences,
-                      selectionControls: MaterialTextSelectionControls(),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),

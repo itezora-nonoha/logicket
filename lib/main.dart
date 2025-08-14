@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'services/note_service.dart';
 import 'screens/auth_wrapper.dart';
 import 'services/auth_service.dart';
+import 'services/settings_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,6 +34,9 @@ class LogicketApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => NoteService()),
+        ChangeNotifierProvider(
+          create: (_) => SettingsService()..initialize(),
+        ),
       ],
       child: MaterialApp(
         title: 'Logicket',
