@@ -59,6 +59,7 @@ class NoteCard extends StatelessWidget {
                         note.title!,
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.bold,
+                          fontFamily: 'NotoSansJP',
                         ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
@@ -111,7 +112,8 @@ class NoteCard extends StatelessWidget {
                           note.title!,
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            ),
+                            fontFamily: 'NotoSansJP',
+                          ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -145,18 +147,22 @@ class NoteCard extends StatelessWidget {
             p: const TextStyle(
               fontSize: 14, 
               height: 1.4,
+              fontFamily: 'NotoSansJP',
             ),
             h1: const TextStyle(
               fontSize: 18, 
               fontWeight: FontWeight.bold,
+              fontFamily: 'NotoSansJP',
             ),
             h2: const TextStyle(
               fontSize: 16, 
               fontWeight: FontWeight.bold,
+              fontFamily: 'NotoSansJP',
             ),
             h3: const TextStyle(
               fontSize: 14, 
               fontWeight: FontWeight.bold,
+              fontFamily: 'NotoSansJP',
             ),
             code: TextStyle(
               backgroundColor: Colors.grey[100],
@@ -203,7 +209,8 @@ class NoteCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
-                        ),
+                    fontFamily: 'NotoSansJP',
+                  ),
                 ),
               ),
               // バックリンク数
@@ -219,7 +226,8 @@ class NoteCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey[600],
-                        ),
+                    fontFamily: 'NotoSansJP',
+                  ),
                 ),
                 const SizedBox(width: 12),
               ],
@@ -321,7 +329,7 @@ class NoteCard extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 'ノートをクリップボードにコピーしました',
-                style: const TextStyle(),
+                style: const TextStyle(fontFamily: 'NotoSansJP'),
               ),
             ],
           ),
@@ -339,7 +347,7 @@ class NoteCard extends StatelessWidget {
         SnackBar(
           content: Text(
             'コピーに失敗しました: $error',
-            style: const TextStyle(),
+            style: const TextStyle(fontFamily: 'NotoSansJP'),
           ),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 3),
@@ -371,12 +379,12 @@ class NoteCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('リンク'),
-        content: Text('ノート "$linkHash" への参照です'),
+        title: const Text('リンク', style: TextStyle(fontFamily: 'NotoSansJP')),
+        content: Text('ノート "$linkHash" への参照です', style: const TextStyle(fontFamily: 'NotoSansJP')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('閉じる'),
+            child: const Text('閉じる', style: TextStyle(fontFamily: 'NotoSansJP')),
           ),
         ],
       ),

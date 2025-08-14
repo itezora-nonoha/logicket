@@ -41,7 +41,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey,
-                                          ),
+                      fontFamily: 'NotoSansJP',
+                    ),
                   ),
                 ],
               ),
@@ -85,7 +86,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                                                          ),
+                              fontFamily: 'NotoSansJP',
+                            ),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -96,7 +98,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[700],
-                                                      ),
+                            fontFamily: 'NotoSansJP',
+                          ),
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -122,7 +125,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                               'アーカイブ解除',
                               style: TextStyle(
                                 color: Colors.blue,
-                                                              ),
+                                fontFamily: 'NotoSansJP',
+                              ),
                             ),
                           ],
                         ),
@@ -137,7 +141,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                               '削除',
                               style: TextStyle(
                                 color: Colors.red,
-                                                              ),
+                                fontFamily: 'NotoSansJP',
+                              ),
                             ),
                           ],
                         ),
@@ -156,7 +161,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey[600],
-                                          ),
+                      fontFamily: 'NotoSansJP',
+                    ),
                   ),
                   if (note.inspirationDate != null) ...[
                     const Spacer(),
@@ -167,7 +173,8 @@ class ArchivedNotesScreen extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
-                                              ),
+                        fontFamily: 'NotoSansJP',
+                      ),
                     ),
                   ],
                 ],

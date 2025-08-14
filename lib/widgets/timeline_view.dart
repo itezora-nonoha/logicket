@@ -138,7 +138,8 @@ class TimelineViewState extends State<TimelineView> {
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 14,
-                                              ),
+                        fontFamily: 'NotoSansJP',
+                      ),
                     ),
                     const Spacer(),
                     TextButton(
@@ -152,7 +153,8 @@ class TimelineViewState extends State<TimelineView> {
                         'キャンセル',
                         style: TextStyle(
                           color: Theme.of(context).primaryColor,
-                                                  ),
+                          fontFamily: 'NotoSansJP',
+                        ),
                       ),
                     ),
                   ],

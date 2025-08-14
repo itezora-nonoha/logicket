@@ -91,3 +91,13 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
+  # 日本語フォントの追加
+  fonts:
+    - family: NotoSansJP
+      fonts:
+        - asset: fonts/NotoSansJP-Regular.ttf
+          weight: 400
+        - asset: fonts/NotoSansJP-Medium.ttf
+          weight: 500
+        - asset: fonts/NotoSansJP-Bold.ttf
+          weight: 700

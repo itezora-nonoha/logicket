@@ -363,7 +363,8 @@ class _SearchPage extends StatelessWidget {
             'ノートの管理',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.bold,
-                          ),
+              fontFamily: 'NotoSansJP',
+            ),
           ),
           const SizedBox(height: 16),
           Card(

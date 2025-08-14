@@ -121,7 +121,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                 '保存',
                 style: TextStyle(
                   color: Colors.white,
-                                  ),
+                  fontFamily: 'NotoSansJP',
+                ),
               ),
             ),
         ],
@@ -155,7 +156,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       style: TextStyle(
                         color: Theme.of(context).primaryColor,
                         fontSize: 14,
-                                              ),
+                        fontFamily: 'NotoSansJP',
+                      ),
                     ),
                   ],
                 ),
@@ -178,7 +180,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               ),
               style: const TextStyle(
                 fontSize: 16,
-                              ),
+                fontFamily: 'NotoSansJP',
+              ),
             ),
             
             const SizedBox(height: 16),
@@ -201,7 +204,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       : '発想した日を選択...',
                   style: TextStyle(
                     fontSize: 16,
-                                        color: _inspirationDate != null 
+                    fontFamily: 'NotoSansJP',
+                    color: _inspirationDate != null 
                         ? Colors.black87 
                         : Colors.grey[600],
                   ),
@@ -258,14 +262,16 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   alignLabelWithHint: true,
                 ),
                 strutStyle: const StrutStyle(
-                                    fontSize: 16,
+                  fontFamily: 'NotoSansJP',
+                  fontSize: 16,
                   height: 1.4,
                   forceStrutHeight: true,
                 ),
                 style: const TextStyle(
                   fontSize: 16,
                   height: 1.4,
-                                  ),
+                  fontFamily: 'NotoSansJP',
+                ),
               ),
             ),
             
@@ -282,7 +288,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                       color: _currentContentLength > _maxContentLength 
                           ? Colors.red 
                           : Colors.grey[600],
-                                          ),
+                      fontFamily: 'NotoSansJP',
+                    ),
                   ),
                 ],
               ),
