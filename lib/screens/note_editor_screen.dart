@@ -446,6 +446,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           textCapitalization: TextCapitalization.sentences,
                           selectionControls: MaterialTextSelectionControls(),
                           showCursor: true,
+                          selectionColor: Theme.of(context).primaryColor,
                           readOnly: false,
                         ),
                       ],
