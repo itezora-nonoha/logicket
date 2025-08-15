@@ -380,6 +380,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
               child: Text(
                 '本文',
                 style: TextStyle(
+                  fontFamily: 'NotoSansJP',
                   fontSize: 12,
                   color: _currentContentLength > _maxContentLength
                       ? Colors.red
@@ -409,6 +410,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                               child: Text(
                                 'マークダウン記法が使用できます',
                                 style: TextStyle(
+                                  fontFamily: 'NotoSansJP',
                                   fontSize: 16,
                                   height: 1.4,
                                   color: Theme.of(context).hintColor,
@@ -421,6 +423,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           controller: _contentController,
                           focusNode: _contentFocusNode,
                           style: TextStyle(
+                            fontFamily: 'NotoSansJP',
                             fontSize: 16,
                             height: 1.4,
                             color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
