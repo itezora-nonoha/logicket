@@ -41,7 +41,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
 
     // テキスト変更リスナーを追加
     _contentController.addListener(_onTextChanged);
-    
+
     // フォーカス変更リスナーを追加
     _contentFocusNode.addListener(() {
       setState(() {
@@ -105,6 +105,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
           widget.note == null ? '新しいノート' : 'ノートを編集',
@@ -132,135 +133,143 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            if (widget.insertAfterOrder != null)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(12),
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.3),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              if (widget.insertAfterOrder != null)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Theme.of(context).primaryColor.withOpacity(0.3),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '指定された位置に挿入されます',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                          fontSize: 14,
+                          fontFamily: 'NotoSansJP',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.info_outline,
-                      size: 16,
-                      color: Theme.of(context).primaryColor,
+
+              // タイトル入力欄
+              TextField(
+                controller: _titleController,
+                autocorrect: false,
+                enableSuggestions: false,
+                textInputAction: TextInputAction.next,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(
+                  labelText: 'タイトル（任意）',
+                  hintText: 'ノートのタイトルを入力...',
+                  border: OutlineInputBorder(),
+                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                  contentPadding: EdgeInsets.all(16),
+                ),
+                style: const TextStyle(fontSize: 16, fontFamily: 'NotoSansJP'),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 発想日入力欄
+              InkWell(
+                onTap: _selectInspirationDate,
+                borderRadius: BorderRadius.circular(4),
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: '発想日（任意）',
+                    border: OutlineInputBorder(),
+                    labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                    contentPadding: EdgeInsets.all(16),
+                    suffixIcon: Icon(Icons.calendar_today),
+                  ),
+                  child: Text(
+                    _inspirationDate != null
+                        ? _formatDate(_inspirationDate!)
+                        : '発想した日を選択...',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'NotoSansJP',
+                      color: _inspirationDate != null
+                          ? Colors.black87
+                          : Colors.grey[600],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '指定された位置に挿入されます',
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontSize: 14,
-                        fontFamily: 'NotoSansJP',
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // 本文入力欄
+              Expanded(
+                child: Consumer<SettingsService>(
+                  builder: (context, settingsService, child) {
+                    return settingsService.useEditableText
+                        ? _buildEditableTextInput(context)
+                        : _buildTextFieldInput(context);
+                  },
+                ),
+              ),
+
+              // 文字数表示と保存ボタンエリア
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Column(
+                  children: [
+                    // 文字数表示
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$_currentContentLength / $_maxContentLength',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: _currentContentLength > _maxContentLength
+                                ? Colors.red
+                                : Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    // 保存ボタン
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : _saveNote,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: Text(_isLoading ? '保存中...' : '保存'),
                       ),
                     ),
                   ],
                 ),
               ),
-
-            // タイトル入力欄
-            TextField(
-              controller: _titleController,
-              autocorrect: false,
-              enableSuggestions: false,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: 'タイトル（任意）',
-                hintText: 'ノートのタイトルを入力...',
-                border: OutlineInputBorder(),
-                labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                contentPadding: EdgeInsets.all(16),
-              ),
-              style: const TextStyle(fontSize: 16, fontFamily: 'NotoSansJP'),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 発想日入力欄
-            InkWell(
-              onTap: _selectInspirationDate,
-              borderRadius: BorderRadius.circular(4),
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: '発想日（任意）',
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: EdgeInsets.all(16),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                child: Text(
-                  _inspirationDate != null
-                      ? _formatDate(_inspirationDate!)
-                      : '発想した日を選択...',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'NotoSansJP',
-                    color: _inspirationDate != null
-                        ? Colors.black87
-                        : Colors.grey[600],
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // 本文入力欄
-            Expanded(
-              child: Consumer<SettingsService>(
-                builder: (context, settingsService, child) {
-                  return settingsService.useEditableText
-                      ? _buildEditableTextInput(context)
-                      : _buildTextFieldInput(context);
-                },
-              ),
-            ),
-
-            // 文字数表示
-            Padding(
-              padding: const EdgeInsets.only(top: 4, right: 16),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    '$_currentContentLength / $_maxContentLength',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: _currentContentLength > _maxContentLength
-                          ? Colors.red
-                          : Colors.grey[600],
-                      fontFamily: 'NotoSansJP',
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _saveNote,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  textStyle: const TextStyle(fontFamily: 'NotoSansJP'),
-                ),
-                child: Text(_isLoading ? '保存中...' : '保存'),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -365,8 +374,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
             color: _currentContentLength > _maxContentLength
                 ? Colors.red
                 : (_contentFocusNode.hasFocus
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey),
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey),
             width: _contentFocusNode.hasFocus ? 2.0 : 1.0,
           ),
           borderRadius: BorderRadius.circular(4),
@@ -385,8 +394,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                   color: _currentContentLength > _maxContentLength
                       ? Colors.red
                       : (_contentFocusNode.hasFocus
-                          ? Theme.of(context).primaryColor
-                          : Colors.grey[600]),
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey[600]),
                 ),
               ),
             ),
@@ -426,7 +435,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                             fontFamily: 'NotoSansJP',
                             fontSize: 16,
                             height: 1.4,
-                            color: Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black87,
+                            color:
+                                Theme.of(context).textTheme.bodyLarge?.color ??
+                                Colors.black87,
                           ),
                           strutStyle: const StrutStyle(
                             fontSize: 16,
@@ -435,7 +446,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           ),
                           cursorColor: Theme.of(context).primaryColor,
                           cursorWidth: 1.0,
-                          backgroundCursorColor: Colors.grey[300] ?? Colors.grey,
+                          backgroundCursorColor:
+                              Colors.grey[300] ?? Colors.grey,
                           maxLines: null,
                           minLines: 8,
                           textAlign: TextAlign.start,
@@ -507,10 +519,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
         height: 1.4,
         forceStrutHeight: true,
       ),
-      style: const TextStyle(
-        fontSize: 16,
-        height: 1.4,
-      ),
+      style: const TextStyle(fontSize: 16, height: 1.4),
     );
   }
 
