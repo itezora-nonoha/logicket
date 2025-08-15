@@ -45,7 +45,7 @@ class NoteCard extends StatelessWidget {
                   value: isSelected,
                   onChanged: (_) => onTap?.call(),
                 ),
-                const SizedBox(width: 8),
+                // const SizedBox(width: 8),
               ],
               
               // メインコンテンツ
