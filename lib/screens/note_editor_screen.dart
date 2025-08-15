@@ -374,6 +374,7 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       onTap: () {
         _contentFocusNode.requestFocus();
       },
+      behavior: HitTestBehavior.translucent,
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(
@@ -464,8 +465,9 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
                           textCapitalization: TextCapitalization.sentences,
                           selectionControls: MaterialTextSelectionControls(),
                           showCursor: true,
-                          selectionColor: Theme.of(context).primaryColor,
+                          selectionColor: Theme.of(context).primaryColor.withOpacity(0.4),
                           readOnly: false,
+                          enableInteractiveSelection: true,
                         ),
                       ],
                     ),
@@ -492,6 +494,8 @@ class _NoteEditorScreenState extends State<NoteEditorScreen> {
       textAlign: TextAlign.start,
       textAlignVertical: TextAlignVertical.top,
       cursorWidth: 1.0,
+      selectionControls: MaterialTextSelectionControls(),
+      enableInteractiveSelection: true,
       decoration: InputDecoration(
         labelText: '本文',
         hintText: 'マークダウン記法が使用できます',

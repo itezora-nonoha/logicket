@@ -187,54 +187,50 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
               ),
             ),
             
-            // タイトル入力欄
-            TextField(
-              controller: _titleController,
-              autocorrect: false,
-              enableSuggestions: false,
-              textInputAction: TextInputAction.next,
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                labelText: 'タイトル（任意）',
-                hintText: 'まとめノートのタイトルを入力...',
-                border: OutlineInputBorder(),
-                labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                contentPadding: EdgeInsets.all(16),
-              ),
-              style: const TextStyle(
-                fontSize: 16,
-                fontFamily: 'NotoSansJP',
-              ),
-            ),
-            
-            const SizedBox(height: 16),
-            
-            // 発想日入力欄
-            InkWell(
-              onTap: _selectInspirationDate,
-              borderRadius: BorderRadius.circular(4),
-              child: InputDecorator(
-                decoration: const InputDecoration(
-                  labelText: '発想日（任意）',
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
-                  contentPadding: EdgeInsets.all(16),
-                  suffixIcon: Icon(Icons.calendar_today),
-                ),
-                child: Text(
-                  _inspirationDate != null
-                      ? _formatDate(_inspirationDate!)
-                      : '発想した日を選択...',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'NotoSansJP',
-                    color: _inspirationDate != null 
-                        ? Colors.black87 
-                        : Colors.grey[600],
+            // タイトル入力欄と発想日アイコン
+            Row(
+              children: [
+                // タイトル入力欄
+                Expanded(
+                  child: TextField(
+                    controller: _titleController,
+                    autocorrect: false,
+                    enableSuggestions: false,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.text,
+                    decoration: const InputDecoration(
+                      labelText: 'タイトル（任意）',
+                      hintText: 'まとめノートのタイトルを入力...',
+                      border: OutlineInputBorder(),
+                      labelStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                      hintStyle: TextStyle(fontFamily: 'NotoSansJP'),
+                      contentPadding: EdgeInsets.all(16),
+                    ),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'NotoSansJP',
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(width: 4),
+                // 発想日アイコン
+                Container(
+                  height: 56, // TextFieldと同じ高さに合わせる
+                  width: 56,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.calendar_today,
+                      color: _inspirationDate != null
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[600],
+                    ),
+                    onPressed: _selectInspirationDate,
+                    tooltip: _inspirationDate != null
+                        ? '発想日: ${_formatDate(_inspirationDate!)}' 
+                        : '発想日を設定',
+                  ),
+                ),
+              ],
             ),
             
             const SizedBox(height: 16),
@@ -254,6 +250,8 @@ class _NoteMergingScreenState extends State<NoteMergingScreen> {
                 textAlign: TextAlign.start,
                 textAlignVertical: TextAlignVertical.top,
                 cursorWidth: 1.0,
+                selectionControls: MaterialTextSelectionControls(),
+                enableInteractiveSelection: true,
                 decoration: InputDecoration(
                   labelText: '本文',
                   hintText: '選択したノートの内容を編集・まとめ直してください',
