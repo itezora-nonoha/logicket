@@ -102,10 +102,10 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: Colors.lightBlue[50],
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: Colors.lightBlue[300]!,
+                        color: Theme.of(context).primaryColor.withOpacity(0.3),
                         width: 1,
                       ),
                     ),
@@ -113,16 +113,16 @@ class _NoteDetailScreenState extends State<NoteDetailScreen> {
                       children: [
                         Icon(
                           Icons.archive,
-                          color: Colors.lightBlue[500],
                           size: 20,
+                          color: Theme.of(context).primaryColor,
                         ),
                         const SizedBox(width: 8),
                         Text(
                           'このノートはアーカイブされています',
                           style: TextStyle(
-                            color: Colors.lightBlue[500],
+                            color: Theme.of(context).primaryColor,
                             fontSize: 14,
-                            fontWeight: FontWeight.w500,
+                            fontFamily: 'NotoSansJP',
                           ),
                         ),
                       ],
