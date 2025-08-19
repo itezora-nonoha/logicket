@@ -29,14 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authService = context.read<AuthService>();
-      final noteService = context.read<NoteService>();
-      
-      if (authService.isAuthenticated && authService.userId != null) {
-        noteService.loadNotes(authService.userId!);
-      }
-    });
+    // ノートロードはAuthWrapperで行われるため、ここでは不要
   }
 
   @override

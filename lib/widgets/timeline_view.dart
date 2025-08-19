@@ -89,18 +89,27 @@ class TimelineViewState extends State<TimelineView> {
   Widget build(BuildContext context) {
     return Consumer2<NoteService, AuthService>(
       builder: (context, noteService, authService, child) {
-        if (noteService.isLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
         final notes = noteService.notes;
         
         // デバッグ用：ノート数を確認
         debugPrint('TimelineView: 全体で${noteService.notes.length}件、表示対象${notes.length}件');
         
-        if (notes.isEmpty) {
+        // ローディング中かつノートがない場合
+        if (noteService.isLoading && notes.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('ノートを読み込み中...'),
+              ],
+            ),
+          );
+        }
+        
+        // ローディング完了してノートがない場合
+        if (!noteService.isLoading && notes.isEmpty) {
           return const Center(
             child: Text('ノートがありません\n「+」ボタンで新しいノートを作成しましょう'),
           );
@@ -166,8 +175,18 @@ class TimelineViewState extends State<TimelineView> {
               child: _isSelectionMode
                   ? ListView.builder(
                       padding: const EdgeInsets.all(16),
-                      itemCount: notes.length,
+                      itemCount: notes.length + (noteService.isLoading ? 1 : 0),
                       itemBuilder: (context, index) {
+                        // ローディングインジケーター表示
+                        if (index == notes.length) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+                        
                         debugPrint('選択モード ListView.builder: itemBuilder called for index $index');
                         final note = notes[index];
                         final isLast = index == notes.length - 1;
@@ -181,38 +200,52 @@ class TimelineViewState extends State<TimelineView> {
                               isSelected: isSelected,
                               onTap: () => _toggleNoteSelection(note.id),
                             ),
-                            if (isLast) const SizedBox(height: 8),
+                            if (isLast && !noteService.isLoading) const SizedBox(height: 8),
                           ],
                         );
                       },
                     )
-                  : ReorderableListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: notes.length,
-                      onReorder: (oldIndex, newIndex) => _reorderNotes(context, notes, oldIndex, newIndex),
-                      itemBuilder: (context, index) {
-                        final note = notes[index];
-                        final isLast = index == notes.length - 1;
-                        final isSelected = _selectedNoteIds.contains(note.id);
-                        
-                        return Container(
-                          key: ValueKey(note.id),
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              NoteCard(
-                                note: note,
-                                isSelectionMode: _isSelectionMode,
-                                isSelected: isSelected,
-                                onTap: () => _navigateToDetail(context, note),
-                              ),
-                              if (!isLast) 
-                                _buildDividerWithInsertButton(context, note.order),
-                              if (isLast) const SizedBox(height: 8),
-                            ],
+                  : Column(
+                      children: [
+                        Expanded(
+                          child: ReorderableListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: notes.length,
+                            onReorder: (oldIndex, newIndex) => _reorderNotes(context, notes, oldIndex, newIndex),
+                            itemBuilder: (context, index) {
+                              final note = notes[index];
+                              final isLast = index == notes.length - 1;
+                              final isSelected = _selectedNoteIds.contains(note.id);
+                              
+                              return Container(
+                                key: ValueKey(note.id),
+                                width: double.infinity,
+                                child: Column(
+                                  children: [
+                                    NoteCard(
+                                      note: note,
+                                      isSelectionMode: _isSelectionMode,
+                                      isSelected: isSelected,
+                                      onTap: () => _navigateToDetail(context, note),
+                                    ),
+                                    if (!isLast) 
+                                      _buildDividerWithInsertButton(context, note.order),
+                                    if (isLast && !noteService.isLoading) const SizedBox(height: 8),
+                                  ],
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                        // ローディングインジケーター
+                        if (noteService.isLoading)
+                          const Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          ),
+                      ],
                     ),
             ),
           ],

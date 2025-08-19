@@ -39,6 +39,8 @@ class NoteService extends ChangeNotifier {
     return hash;
   }
 
+  bool get isLoading => _isLoading;
+
   List<Note> get notes {
     List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && !note.isArchived).toList();
     sortedNotes.sort((a, b) => b.order.compareTo(a.order)); // 降順（新しいものが上）
@@ -46,12 +48,15 @@ class NoteService extends ChangeNotifier {
   }
 
   List<Note> get archivedNotes {
-    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && note.isArchived).toList();
+    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && !note.isArchived).toList();
     sortedNotes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt)); // 降順（新しくアーカイブされたものが上）
     return sortedNotes;
   }
 
-  bool get isLoading => _isLoading;
+  void cancelLoading() {
+    _isLoading = false;
+    notifyListeners();
+  }
 
   // 指定されたノートを参照している（内部リンクが貼られている）ノートを取得
   List<Note> getBacklinks(String noteId) {
