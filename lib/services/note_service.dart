@@ -48,8 +48,13 @@ class NoteService extends ChangeNotifier {
   }
 
   List<Note> get archivedNotes {
-    List<Note> sortedNotes = _notes.where((note) => note.isDeleted || note.isArchived).toList();
+    List<Note> sortedNotes = _notes.where((note) => !note.isDeleted && note.isArchived).toList();
     sortedNotes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt)); // 降順（新しくアーカイブされたものが上）
+    return sortedNotes;
+  }
+  List<Note> get deletedNotes {
+    List<Note> sortedNotes = _notes.where((note) => note.isDeleted).toList();
+    sortedNotes.sort((a, b) => b.updatedAt.compareTo(a.updatedAt)); // 降順（新しく削除されたものが上）
     return sortedNotes;
   }
 
